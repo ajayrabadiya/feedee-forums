@@ -1,2 +1,7 @@
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /api/
+Disallow: /login
+Disallow: /create-post
+
+Sitemap: https://feedeeforums.com/sitemap.xml
