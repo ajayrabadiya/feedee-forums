@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Guide - Feedee Forums Admin</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#131313">
+    <link rel="icon" href="../assets/images/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin">
+        <!-- Sidebar -->
+        <aside class="admin-side" aria-label="Admin navigation">
+            <a href="index.html" class="logo"><img src="../assets/images/logo.png" alt="Feedee Forums" width="150" height="40"></a>
+
+            <div class="side-label">Overview</div>
+            <ul class="side-nav">
+                <li><a href="index.html"><i class="bi bi-grid-1x2"></i>Dashboard</a></li>
+            </ul>
+
+            <div class="side-label">Moderation</div>
+            <ul class="side-nav">
+                <li><a href="posts.html"><i class="bi bi-file-earmark-richtext"></i>Posts<span class="count">5</span></a></li>
+                <li><a href="reports.html"><i class="bi bi-flag"></i>Reports<span class="count hot">5</span></a></li>
+            </ul>
+
+            <div class="side-label">Help</div>
+            <ul class="side-nav">
+                <li><a href="docs.html" class="active" aria-current="page"><i class="bi bi-book"></i>Admin guide</a></li>
+                <li><a href="../index.html" target="_blank" rel="noopener"><i class="bi bi-box-arrow-up-right"></i>View site</a></li>
+            </ul>
+
+            <div class="side-foot">
+                <div class="cron-mini">
+                    <strong><span class="dot-live"></span>Scheduler running</strong>
+                    Last cleanup today at 03:00<br>Next run in 3h 42m
+                </div>
+                <ul class="side-nav">
+                    <li><a href="../login.html"><i class="bi bi-box-arrow-left"></i>Log out</a></li>
+                </ul>
+            </div>
+        </aside>
+        <div class="side-backdrop"></div>
+
+        <div class="admin-main">
+            <header class="admin-top">
+                <button class="side-toggle" type="button" aria-label="Toggle sidebar"><i class="bi bi-list"></i></button>
+                <div>
+                    <h1>Admin guide</h1>
+                    <p class="sub">How to moderate Feedee Forums</p>
+                </div>
+                <form class="admin-search" role="search" action="posts.html">
+                    <i class="bi bi-search"></i>
+                    <input type="search" name="q" placeholder="Search posts, users or IDs" aria-label="Search">
+                </form>
+                <a href="reports.html" class="top-icon" aria-label="5 open reports"><i class="bi bi-bell"></i><span class="dot"></span></a>
+                <div class="dropdown">
+                    <button class="admin-user" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="https://picsum.photos/seed/ff-admin/80/80" width="38" height="38" alt="Admin profile photo">
+                        <span class="who"><strong>Alex Morgan</strong><span>Administrator</span></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="../index.html"><i class="bi bi-house-door"></i>View site</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="../login.html"><i class="bi bi-box-arrow-left"></i>Log out</a></li>
+                    </ul>
+                </div>
+            </header>
+
+            <main class="admin-content">
+                <div class="row g-4">
+                    <div class="col-xl-3 d-none d-xl-block">
+                        <div class="panel sticky-lg">
+                            <ul class="doc-nav">
+                                <li><a href="#review">Reviewing posts</a></li>
+                                <li><a href="#feature">Featuring posts</a></li>
+                                <li><a href="#delete">Deleting posts</a></li>
+                                <li><a href="#reports">Handling reports</a></li>
+                                <li><a href="#cleanup">30-day auto cleanup</a></li>
+                                <li><a href="#tips">Good moderation</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-9 doc">
+                        <section class="panel-card prose" id="review">
+                            <h2>Reviewing posts</h2>
+                            <p>The <b>Require approval for new posts</b> switch at the top of the Posts page controls how new posts are handled:</p>
+                            <ul>
+                                <li><b>Off</b> (recommended at launch): new posts go live in the feed straight away. Moderate them afterwards from <b>Posts &rarr; Approved</b> or when they're reported.</li>
+                                <li><b>On</b>: every new post starts as <span class="status st-pending">Pending</span> and stays hidden until approved. Open <b>Posts &rarr; Pending</b> to see the queue, oldest first.</li>
+                            </ul>
+                            <p>Whichever mode you use:</p>
+                            <ul>
+                                <li><b>Approve</b> <i class="bi bi-check-lg"></i> publishes a pending post at the top of the feed and starts its 30-day timer.</li>
+                                <li><b>Reject</b> <i class="bi bi-x-lg"></i> asks for a reason, which is emailed to the author, and removes the post from the feed if it was already live.</li>
+                                <li>Tick several posts to approve, reject, feature or delete them in one go.</li>
+                            </ul>
+                            <div class="callout info">
+                                <i class="bi bi-info-circle"></i>
+                                <div><strong>Check the media</strong><p>Click a post title to preview every photo and the video before approving.</p></div>
+                            </div>
+                        </section>
+
+                        <section class="panel-card prose" id="feature">
+                            <h2>Featuring posts</h2>
+                            <p>Click the <i class="bi bi-star"></i> star to pin a post in the <b>Featured</b> section above the chronological feed. Featuring a pending post approves it automatically. Click the star again to unfeature. Keep it to one or two posts at a time.</p>
+                        </section>
+
+                        <section class="panel-card prose" id="delete">
+                            <h2>Deleting posts</h2>
+                            <p>The <i class="bi bi-trash3"></i> delete action permanently removes the post, all original photos and videos, and every generated thumbnail from storage. It cannot be undone, so you'll always be asked to confirm.</p>
+                        </section>
+
+                        <section class="panel-card prose" id="reports">
+                            <h2>Handling reports</h2>
+                            <p>Members can report any live post. Reports for the same post are grouped, so the <b>Reports</b> column shows how many people flagged it.</p>
+                            <ul>
+                                <li><b>Dismiss</b> <i class="bi bi-check2"></i> when the post doesn't break the rules. It stays live.</li>
+                                <li><b>Remove post</b> <i class="bi bi-trash3"></i> when it does. The post and media are deleted and the author is notified.</li>
+                                <li>Reporter identities are visible to admins only, never to the post author.</li>
+                            </ul>
+                        </section>
+
+                        <section class="panel-card prose" id="cleanup">
+                            <h2>30-day auto cleanup</h2>
+                            <p>Posts are deleted automatically 30 days after they go live by the Laravel Scheduler. The dashboard shows when each job last ran. On Hostinger, a single cron job runs the scheduler every minute:</p>
+<pre><code>* * * * * cd /home/USER/domains/feedeeforums.com/laravel &amp;&amp; php artisan schedule:run &gt;&gt; /dev/null 2&gt;&amp;1</code></pre>
+                            <p>If the dashboard shows a job that hasn't run recently, check the cron entry in <b>hPanel &rarr; Advanced &rarr; Cron Jobs</b>. You can also use <b>Run now</b> on the dashboard to trigger cleanup manually.</p>
+                        </section>
+
+                        <section class="panel-card prose" id="tips">
+                            <h2>Good moderation</h2>
+                            <ul>
+                                <li>Aim to clear the pending queue at least twice a day.</li>
+                                <li>Always choose an accurate rejection reason so authors can fix and resubmit.</li>
+                                <li>When unsure, leave a post pending and ask another admin.</li>
+                                <li>Never share reporter details or private member information.</li>
+                            </ul>
+                        </section>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="../assets/js/jquery.min.js"></script>
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/custom.js"></script>
+    <script src="../assets/js/admin.js"></script>
+</body>
+</html>
