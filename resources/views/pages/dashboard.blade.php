@@ -69,11 +69,14 @@
                                     @endif
                                 </p>
                             </div>
-                            <form method="post" action="{{ route('posts.destroy', $post) }}" class="my-post-delete" data-confirm="Delete this post and all of its photos and videos? This can't be undone.">
-                                @csrf
-                                @method('delete')
-                                <button type="submit" class="icon-btn" aria-label="Delete post: {{ $post->title }}" title="Delete post"><i class="bi bi-trash3"></i></button>
-                            </form>
+                            <div class="my-post-actions">
+                                <a href="{{ route('posts.edit', $post) }}" class="icon-btn" aria-label="Edit post: {{ $post->title }}" title="Edit post"><i class="bi bi-pencil-square"></i></a>
+                                <form method="post" action="{{ route('posts.destroy', $post) }}" class="my-post-delete" data-confirm="Delete this post and all of its photos and videos? This can't be undone.">
+                                    @csrf
+                                    @method('delete')
+                                    <button type="submit" class="icon-btn" aria-label="Delete post: {{ $post->title }}" title="Delete post"><i class="bi bi-trash3"></i></button>
+                                </form>
+                            </div>
                         </article>
                     @empty
                         <div class="my-post-empty">

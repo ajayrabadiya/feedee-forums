@@ -34,6 +34,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/create-post', [PostController::class, 'create'])->name('posts.create');
     Route::post('/create-post', [PostController::class, 'store'])->middleware('throttle:10,1')->name('posts.store');
+    Route::get('/p/{post:public_id}/edit', [PostController::class, 'edit'])->name('posts.edit');
+    Route::put('/p/{post:public_id}', [PostController::class, 'update'])->middleware('throttle:10,1')->name('posts.update');
     Route::delete('/p/{post:public_id}', [PostController::class, 'destroy'])->name('posts.destroy');
 });
 

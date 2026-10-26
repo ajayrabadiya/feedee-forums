@@ -35,6 +35,9 @@
                         <div class="dropdown">
                             <button class="icon-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Post options"><i class="bi bi-three-dots"></i></button>
                             <ul class="dropdown-menu dropdown-menu-end">
+                                @can('update', $post)
+                                    <li><a class="dropdown-item" href="{{ route('posts.edit', $post) }}"><i class="bi bi-pencil-square"></i>Edit post</a></li>
+                                @endcan
                                 <li><a class="dropdown-item" href="#" data-copy="{{ route('posts.show', $post) }}" data-copy-msg="Post link copied"><i class="bi bi-link-45deg"></i>Copy link</a></li>
                                 <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#reportModal"><i class="bi bi-flag"></i>Report post</a></li>
                             </ul>
@@ -94,6 +97,9 @@
 
                     <div class="post-actions">
                         <button type="button" class="btn-soft" data-copy="{{ route('posts.show', $post) }}" data-copy-msg="Post link copied"><i class="bi bi-link-45deg"></i>Copy link</button>
+                        @can('update', $post)
+                            <a href="{{ route('posts.edit', $post) }}" class="btn-soft"><i class="bi bi-pencil-square"></i>Edit post</a>
+                        @endcan
                         @can('delete', $post)
                             <form method="post" action="{{ route('posts.destroy', $post) }}" class="ms-auto" data-confirm="Delete this post and all of its photos and videos? This can't be undone.">
                                 @csrf

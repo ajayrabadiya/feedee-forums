@@ -268,6 +268,19 @@ $(function () {
         }
     };
 
+    /* Existing media on the edit form: toggle "remove when saved" */
+    function syncRemoveToggle(input) {
+        var removed = input.checked;
+        var $label = $(input).closest('.preview-remove');
+
+        $(input).closest('.existing-item').toggleClass('is-removed', removed);
+        $label.attr('title', removed ? 'Keep this file' : 'Remove this file')
+            .find('i').attr('class', removed ? 'bi bi-arrow-counterclockwise' : 'bi bi-x-lg');
+    }
+
+    $('[data-remove-toggle]').each(function () { syncRemoveToggle(this); })
+        .on('change', function () { syncRemoveToggle(this); });
+
     function limitsFor($zone) {
         var base = LIMITS[$zone.data('kind')];
         var types = $zone.data('types');
@@ -382,7 +395,9 @@ $(function () {
                     errors.push(file.name + ': file is larger than ' + formatSize(rules.maxSize) + '.');
                     return;
                 }
-                if (store.files.length >= rules.maxFiles) {
+                var kept = $($zone.data('existing')).find('.existing-item:not(.is-removed)').length;
+
+                if (store.files.length + kept >= rules.maxFiles) {
                     errors.push('You can upload up to ' + rules.maxFiles + (kind === 'image' ? ' photos.' : (rules.maxFiles === 1 ? ' video.' : ' videos.')));
                     return;
                 }
