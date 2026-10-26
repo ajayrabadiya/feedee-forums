@@ -1214,6 +1214,14 @@ a.stat-card:hover {
     line-height: 1.4;
 }
 
+.report-list a:hover strong {
+    color: var(--primary);
+}
+
+.report-list li.is-unread strong {
+    font-weight: 700;
+}
+
 .report-list p {
     margin: 2px 0 0;
     color: var(--muted);
