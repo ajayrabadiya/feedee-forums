@@ -425,6 +425,52 @@ $(function () {
         });
     });
 
+    /* Floating support button */
+    if (!$body.hasClass('admin-body')) {
+        var $support = $(
+            '<div class="support-fab">' +
+                '<div class="support-dial" id="supportDial" role="group" aria-label="Support options">' +
+                    '<a class="support-dial-item dial-cashapp" style="--d: 1" href="https://cash.app/$zaiyaxx" target="_blank" rel="noopener nofollow">' +
+                        '<span class="support-dial-label"><strong>Cash App</strong><small>$zaiyaxx &middot; US only</small></span>' +
+                        '<span class="support-dial-icon"><i class="bi bi-currency-dollar"></i></span>' +
+                    '</a>' +
+                    '<a class="support-dial-item dial-youpay" style="--d: 0" href="https://youpay.me/zaiyaxx" target="_blank" rel="noopener nofollow">' +
+                        '<span class="support-dial-label"><strong>YouPay</strong><small>Gifts &middot; worldwide</small></span>' +
+                        '<span class="support-dial-icon"><i class="bi bi-gift-fill"></i></span>' +
+                    '</a>' +
+                '</div>' +
+                '<button type="button" class="support-fab-btn" aria-expanded="false" aria-controls="supportDial">' +
+                    '<span class="support-fab-icon"><i class="bi bi-heart-fill"></i></span><span class="support-fab-text">Support</span>' +
+                '</button>' +
+            '</div>'
+        ).appendTo($body);
+
+        var $supportBtn = $support.find('.support-fab-btn');
+
+        $body.addClass('has-support-fab');
+
+        function setSupportOpen(open) {
+            $support.toggleClass('is-open', open);
+            $supportBtn.attr('aria-expanded', open)
+                .find('i').attr('class', open ? 'bi bi-x-lg' : 'bi bi-heart-fill');
+        }
+
+        $supportBtn.on('click', function () {
+            setSupportOpen(!$support.hasClass('is-open'));
+        });
+
+        $(document).on('click', function (e) {
+            if ($support.hasClass('is-open') && !$(e.target).closest('.support-fab').length) {
+                setSupportOpen(false);
+            }
+        }).on('keydown', function (e) {
+            if (e.key === 'Escape' && $support.hasClass('is-open')) {
+                setSupportOpen(false);
+                $supportBtn.trigger('focus');
+            }
+        });
+    }
+
     /* Cash App amount chips */
     $('.amount-chips').on('click', 'button', function () {
         var $btn = $(this);
