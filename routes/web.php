@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\PostModerationController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Auth\LoginController;
@@ -47,5 +48,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/posts/moderate', [PostModerationController::class, 'moderate'])->middleware('throttle:60,1')->name('posts.moderate');
     Route::put('/settings/post-approval', [SettingController::class, 'updatePostApproval'])->name('settings.post-approval');
     Route::view('/reports', 'admin.reports')->name('reports');
+    Route::get('/customers', CustomerController::class)->name('customers');
     Route::view('/docs', 'admin.docs')->name('docs');
 });

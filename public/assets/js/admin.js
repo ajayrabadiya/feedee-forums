@@ -123,6 +123,11 @@ $(function () {
             dt.search(this.value).draw();
         });
 
+        var initialSearch = $panel.find('.table-search').val();
+        if (initialSearch) {
+            dt.search(initialSearch).draw();
+        }
+
         $panel.find('.column-filter').on('change', function () {
             dt.column($(this).data('column')).search(this.value).draw();
         });

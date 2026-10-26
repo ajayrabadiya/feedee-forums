@@ -661,6 +661,38 @@
     white-space: nowrap;
 }
 
+.cell-customer strong {
+    display: block;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.cell-customer small,
+.post-breakdown {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.cell-email:hover {
+    color: var(--primary);
+}
+
+.act.disabled-link {
+    opacity: .4;
+    pointer-events: none;
+}
+
+a.stat-card:hover {
+    border-color: var(--primary);
+}
+
+.cell-user.cell-customer .avatar-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+}
+
 .cell-user .avatar-icon {
     width: 28px;
     height: 28px;

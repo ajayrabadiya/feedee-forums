@@ -12,6 +12,11 @@
                 <li><a href="{{ route('admin.reports') }}"@if (request()->routeIs('admin.reports')) class="active" aria-current="page"@endif><i class="bi bi-flag"></i>Reports<span class="count hot">5</span></a></li>
             </ul>
 
+            <div class="side-label">Community</div>
+            <ul class="side-nav">
+                <li><a href="{{ route('admin.customers') }}"@if (request()->routeIs('admin.customers')) class="active" aria-current="page"@endif><i class="bi bi-people"></i>Customers</a></li>
+            </ul>
+
             <div class="side-label">Help</div>
             <ul class="side-nav">
                 <li><a href="{{ route('admin.docs') }}"@if (request()->routeIs('admin.docs')) class="active" aria-current="page"@endif><i class="bi bi-book"></i>Admin guide</a></li>
