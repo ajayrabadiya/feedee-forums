@@ -661,6 +661,12 @@
     white-space: nowrap;
 }
 
+.cell-user .avatar-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+}
+
 .cell-user img {
     width: 28px;
     height: 28px;

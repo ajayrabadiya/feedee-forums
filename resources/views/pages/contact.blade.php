@@ -137,7 +137,7 @@
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" aria-expanded="false" aria-controls="faq3">What files can I upload?</button>
                     </h3>
                     <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqList">
-                        <div class="accordion-body">Up to 10 photos per post (JPG, PNG or WebP, 8 MB each) and one short video up to 60 seconds (MP4, WebM or MOV, 50 MB).</div>
+                        <div class="accordion-body">Up to {{ config('media.images.max_files') }} photos per post ({{ config('media.images.label') }}, {{ \App\Http\Requests\StorePostRequest::formatKb(config('media.images.max_kb')) }} each) and up to {{ config('media.videos.max_files') }} short videos of {{ config('media.videos.max_seconds') }} seconds or less ({{ config('media.videos.label') }}, {{ \App\Http\Requests\StorePostRequest::formatKb(config('media.videos.max_kb')) }} each).</div>
                     </div>
                 </div>
                 <div class="accordion-item">

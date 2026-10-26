@@ -108,10 +108,10 @@
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <ul class="check-list">
-                                <li><i class="bi bi-check-circle-fill"></i>Up to 10 photos per post</li>
-                                <li><i class="bi bi-check-circle-fill"></i>JPG, PNG or WebP, 8 MB max each</li>
-                                <li><i class="bi bi-check-circle-fill"></i>One video up to 60 seconds</li>
-                                <li><i class="bi bi-check-circle-fill"></i>MP4, WebM or MOV, 50 MB max</li>
+                                <li><i class="bi bi-check-circle-fill"></i>Up to {{ config('media.images.max_files') }} photos per post</li>
+                                <li><i class="bi bi-check-circle-fill"></i>{{ config('media.images.label') }}, {{ \App\Http\Requests\StorePostRequest::formatKb(config('media.images.max_kb')) }} max each</li>
+                                <li><i class="bi bi-check-circle-fill"></i>Up to {{ config('media.videos.max_files') }} videos, {{ config('media.videos.max_seconds') }} seconds each</li>
+                                <li><i class="bi bi-check-circle-fill"></i>{{ config('media.videos.label') }}, {{ \App\Http\Requests\StorePostRequest::formatKb(config('media.videos.max_kb')) }} max</li>
                             </ul>
                         </div>
                         <div class="col-md-6">
@@ -123,7 +123,7 @@
                             </ul>
                         </div>
                     </div>
-                    <p>Please add a short description (alt text) to every photo so members using screen readers can enjoy your post too. Location data is automatically removed from uploaded photos.</p>
+                    <p>Please add a short description (alt text) to every photo so members using screen readers can enjoy your post too. Please remove location data from photos before you share them.</p>
                 </section>
 
                 <section class="panel-card prose" id="deletion">

@@ -2,11 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class AdminPagesTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * @return array<string, array{string, string}>
      */
@@ -23,7 +27,7 @@ class AdminPagesTest extends TestCase
     #[DataProvider('pageProvider')]
     public function test_admin_page_renders(string $uri, string $expectedText): void
     {
-        $response = $this->get($uri);
+        $response = $this->actingAs(User::factory()->admin()->create())->get($uri);
 
         $response->assertOk();
         $response->assertSee($expectedText);
@@ -35,9 +39,20 @@ class AdminPagesTest extends TestCase
 
     public function test_sidebar_marks_current_page_as_active(): void
     {
-        $response = $this->get('/admin/reports');
+        $response = $this->actingAs(User::factory()->admin()->create())->get('/admin/reports');
 
         $response->assertSee('<a href="'.route('admin.reports').'" class="active" aria-current="page">', false);
         $response->assertDontSee('<a href="'.route('admin.posts').'" class="active"', false);
+    }
+
+    public function test_topbar_shows_the_signed_in_administrator(): void
+    {
+        $admin = User::factory()->admin()->create(['name' => 'Jordan Admin']);
+
+        $response = $this->actingAs($admin)->get('/admin');
+
+        $response->assertSee('Jordan Admin');
+        $response->assertSee('Administrator');
+        $response->assertSee('action="'.route('logout').'"', false);
     }
 }

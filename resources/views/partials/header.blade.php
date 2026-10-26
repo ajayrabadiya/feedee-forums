@@ -32,12 +32,33 @@
                     </div>
                 </div>
                 <a href="{{ route('contact') }}" @class(['active' => request()->routeIs('contact')]) @if (request()->routeIs('contact')) aria-current="page" @endif><i class="bi bi-envelope"></i>Contact</a>
-                <a href="{{ route('login') }}" class="d-sm-none"><i class="bi bi-box-arrow-in-right"></i>Log In</a>
+                @guest
+                    <a href="{{ route('login', ['redirect' => request()->getRequestUri()]) }}" class="d-sm-none"><i class="bi bi-box-arrow-in-right"></i>Log In</a>
+                @endguest
             </nav>
 
             <div class="header-btns">
-                <a href="{{ route('login') }}" class="btn-line">Log In</a>
-                <a href="{{ route('register') }}" class="btn-fill">Sign Up</a>
+                @auth
+                    <div class="dropdown user-menu">
+                        <button type="button" class="user-avatar" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account menu for {{ auth()->user()->name }}" title="{{ auth()->user()->name }}">
+                            <i class="bi bi-person-fill" aria-hidden="true"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ auth()->user()->dashboardUrl() }}"><i class="bi bi-grid-1x2"></i>Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bi bi-person"></i>Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="post" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right"></i>Log out</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                @else
+                    <a href="{{ route('login', ['redirect' => request()->getRequestUri()]) }}" class="btn-line">Log In</a>
+                    <a href="{{ route('register', ['redirect' => request()->getRequestUri()]) }}" class="btn-fill">Sign Up</a>
+                @endauth
             </div>
 
             <button class="nav-toggle" type="button" aria-label="Toggle menu" aria-controls="mainNav" aria-expanded="false"><i class="bi bi-list"></i></button>
