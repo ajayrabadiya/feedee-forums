@@ -39,10 +39,36 @@ class AdminPagesTest extends TestCase
 
     public function test_sidebar_marks_current_page_as_active(): void
     {
-        $response = $this->actingAs(User::factory()->admin()->create())->get('/admin/reports');
+        $response = $this->actingAs(User::factory()->admin()->create())->get('/admin/customers');
 
-        $response->assertSee('<a href="'.route('admin.reports').'" class="active" aria-current="page">', false);
+        $response->assertSee('<a href="'.route('admin.customers').'" class="active" aria-current="page">', false);
         $response->assertDontSee('<a href="'.route('admin.posts').'" class="active"', false);
+    }
+
+    public function test_sidebar_only_shows_dashboard_posts_customers_and_contacts(): void
+    {
+        $content = $this->actingAs(User::factory()->admin()->create())->get('/admin')->getContent();
+
+        preg_match('#<aside class="admin-side".*?</aside>#s', $content, $sidebar);
+
+        $this->assertNotEmpty($sidebar);
+        foreach (['Dashboard', 'Posts', 'Customers', 'Contact messages'] as $item) {
+            $this->assertStringContainsString($item, $sidebar[0]);
+        }
+        foreach (['Reports', 'Admin guide', 'View site', 'Log out'] as $removed) {
+            $this->assertStringNotContainsString($removed, $sidebar[0]);
+        }
+    }
+
+    public function test_topbar_has_no_notification_bell(): void
+    {
+        $this->actingAs(User::factory()->admin()->create())->get('/admin')
+            ->assertDontSee('bi-bell', false)
+            ->assertDontSee('open reports')
+            ->assertDontSee('Search posts, users or IDs')
+            ->assertDontSee('Admin guide')
+            ->assertDontSee('Scheduler &amp; cleanup', false)
+            ->assertDontSee('data-run-cleanup', false);
     }
 
     public function test_topbar_shows_the_signed_in_administrator(): void

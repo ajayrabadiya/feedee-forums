@@ -7,7 +7,7 @@
 @section('content')
     @php
         $pendingCount = $posts->filter->isPending()->count();
-        $initialTab = $pendingCount > 0 ? 'pending' : 'all';
+        $initialTab = $pendingCount > 0 && $search === '' ? 'pending' : 'all';
         $tabs = ['pending' => 'Pending', 'approved' => 'Approved', 'featured' => 'Featured', 'rejected' => 'Rejected', 'all' => 'All'];
     @endphp
 
@@ -34,7 +34,7 @@
                     <div class="toolbar">
                         <div class="admin-search">
                             <i class="bi bi-search"></i>
-                            <input type="search" class="table-search" placeholder="Filter by title, author or topic" aria-label="Filter posts">
+                            <input type="search" class="table-search" value="{{ $search }}" placeholder="Filter by title, author or topic" aria-label="Filter posts">
                         </div>
                         <select class="form-select column-filter" data-column="1" aria-label="Filter by topic">
                             <option value="">All topics</option>

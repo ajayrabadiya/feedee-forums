@@ -2807,6 +2807,15 @@ textarea.form-control {
     padding-bottom: 8px;
 }
 
+/* Contact form spam trap: hidden from people, visible to naive bots */
+.contact-trap {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
 /* Home feed */
 .media-item video {
     display: block;

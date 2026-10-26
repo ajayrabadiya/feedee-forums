@@ -9,13 +9,17 @@
             <div class="side-label">Moderation</div>
             <ul class="side-nav">
                 <li><a href="{{ route('admin.posts') }}"@if (request()->routeIs('admin.posts')) class="active" aria-current="page"@endif><i class="bi bi-file-earmark-richtext"></i>Posts<span class="count" data-pending-count title="Posts waiting for review" @if (! $pendingPostsCount) hidden @endif>{{ $pendingPostsCount }}</span></a></li>
-                <li><a href="{{ route('admin.reports') }}"@if (request()->routeIs('admin.reports')) class="active" aria-current="page"@endif><i class="bi bi-flag"></i>Reports<span class="count hot">5</span></a></li>
             </ul>
 
-            <div class="side-label">Help</div>
+            <div class="side-label">Community</div>
             <ul class="side-nav">
-                <li><a href="{{ route('admin.docs') }}"@if (request()->routeIs('admin.docs')) class="active" aria-current="page"@endif><i class="bi bi-book"></i>Admin guide</a></li>
-                <li><a href="{{ route('home') }}" target="_blank" rel="noopener"><i class="bi bi-box-arrow-up-right"></i>View site</a></li>
+                <li><a href="{{ route('admin.customers') }}"@if (request()->routeIs('admin.customers')) class="active" aria-current="page"@endif><i class="bi bi-people"></i>Customers</a></li>
+                <li><a href="{{ route('admin.contacts.index') }}"@if (request()->routeIs('admin.contacts.*')) class="active" aria-current="page"@endif><i class="bi bi-envelope"></i>Contact messages @if ($unreadContactsCount)<span class="count hot" title="Unread messages">{{ $unreadContactsCount }}</span>@endif</a></li>
+            </ul>
+
+            <div class="side-label">System</div>
+            <ul class="side-nav">
+                <li><a href="{{ route('admin.settings') }}"@if (request()->routeIs('admin.settings')) class="active" aria-current="page"@endif><i class="bi bi-gear"></i>Settings</a></li>
             </ul>
 
             <div class="side-foot">
@@ -23,13 +27,5 @@
                     <strong><span class="dot-live"></span>Scheduler running</strong>
                     Last cleanup today at 03:00<br>Next run in 3h 42m
                 </div>
-                <ul class="side-nav">
-                    <li>
-                        <form method="post" action="{{ route('logout') }}">
-                            @csrf
-                            <a href="{{ route('logout') }}" data-logout><i class="bi bi-box-arrow-left"></i>Log out</a>
-                        </form>
-                    </li>
-                </ul>
             </div>
         </aside>

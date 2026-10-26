@@ -15,6 +15,7 @@
         @include('partials.footer')
     @show
 
+@include('partials.support-fab')
 @include('partials.scripts')
 </body>
 </html>

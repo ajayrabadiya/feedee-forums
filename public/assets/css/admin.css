@@ -176,6 +176,10 @@
     font-size: 12px;
 }
 
+.admin-top > .dropdown {
+    margin-left: auto;
+}
+
 .side-toggle {
     display: none;
     place-items: center;
@@ -661,6 +665,161 @@
     white-space: nowrap;
 }
 
+.cell-customer strong {
+    display: block;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.cell-customer small,
+.post-breakdown {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* Settings */
+.settings-panel .panel-head h2 {
+    display: flex;
+    align-items: center;
+}
+
+.settings-panel .form-control,
+.settings-panel .form-select {
+    min-height: 42px;
+}
+
+.setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+}
+
+.setting-row .form-switch .form-check-input {
+    width: 44px;
+    height: 24px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.settings-group {
+    padding: 16px;
+    margin-bottom: 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+
+.settings-group legend {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    float: none;
+    width: auto;
+    padding: 0 6px;
+    margin: 0 0 6px -6px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.settings-group legend i {
+    color: var(--primary);
+}
+
+.test-mail-row {
+    display: flex;
+    gap: 10px;
+}
+
+.test-mail-row .form-control {
+    flex: 1;
+}
+
+/* Contact messages */
+.cell-message {
+    display: block;
+    min-width: 240px;
+    max-width: 460px;
+}
+
+.cell-message strong {
+    display: block;
+    font-weight: 500;
+}
+
+.cell-message small {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.cell-message:hover strong {
+    color: var(--primary);
+}
+
+.admin-table tr.is-unread .cell-message strong,
+.admin-table tr.is-unread .cell-customer strong {
+    font-weight: 700;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 16px;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.back-link:hover {
+    color: var(--primary);
+}
+
+.contact-body {
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.contact-actions {
+    justify-content: flex-start;
+}
+
+.contact-details dt {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.contact-details dd {
+    margin-bottom: 12px;
+    overflow-wrap: anywhere;
+}
+
+.cell-email:hover {
+    color: var(--primary);
+}
+
+.act.disabled-link {
+    opacity: .4;
+    pointer-events: none;
+}
+
+a.stat-card:hover {
+    border-color: var(--primary);
+}
+
+.cell-user.cell-customer .avatar-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+}
+
 .cell-user .avatar-icon {
     width: 28px;
     height: 28px;
@@ -1115,6 +1274,14 @@
     line-height: 1.4;
 }
 
+.report-list a:hover strong {
+    color: var(--primary);
+}
+
+.report-list li.is-unread strong {
+    font-weight: 700;
+}
+
 .report-list p {
     margin: 2px 0 0;
     color: var(--muted);
@@ -1206,7 +1373,6 @@
         padding: 0 16px;
     }
 
-    .admin-top .admin-search,
     .admin-user .who {
         display: none;
     }

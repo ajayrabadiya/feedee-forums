@@ -9,15 +9,18 @@ use App\Models\Post;
 use App\Models\Setting;
 use App\Notifications\PostRejected;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Throwable;
 
 class PostModerationController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         return view('admin.posts', [
+            'search' => is_string($request->query('q')) ? Str::limit(trim($request->query('q')), 100, '') : '',
             'posts' => Post::query()->with(['user', 'media'])->latest()->latest('id')->get(),
             'topics' => Post::TOPICS,
             'rejectionReasons' => Post::REJECTION_REASONS,

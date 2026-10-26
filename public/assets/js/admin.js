@@ -123,6 +123,11 @@ $(function () {
             dt.search(this.value).draw();
         });
 
+        var initialSearch = $panel.find('.table-search').val();
+        if (initialSearch) {
+            dt.search(initialSearch).draw();
+        }
+
         $panel.find('.column-filter').on('change', function () {
             dt.column($(this).data('column')).search(this.value).draw();
         });
@@ -397,6 +402,11 @@ $(function () {
         }).always(function () {
             input.disabled = false;
         });
+    });
+
+    /* Settings: only show SMTP fields when SMTP is selected */
+    $('[data-smtp-toggle]').on('change', function () {
+        $('.smtp-fields').prop('hidden', this.value !== 'smtp');
     });
 
     /* Manual cleanup trigger */

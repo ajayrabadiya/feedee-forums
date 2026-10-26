@@ -24,6 +24,7 @@
         </main>
     </div>
 
+@include('partials.support-fab')
 @include('partials.scripts')
 </body>
 </html>

@@ -4,20 +4,12 @@
                     <h1>@yield('heading')</h1>
                     <p class="sub">@yield('subheading')</p>
                 </div>
-                <form class="admin-search" role="search" action="{{ route('admin.posts') }}">
-                    <i class="bi bi-search"></i>
-                    <input type="search" name="q" placeholder="Search posts, users or IDs" aria-label="Search">
-                </form>
-                <a href="{{ route('admin.reports') }}" class="top-icon" aria-label="5 open reports"><i class="bi bi-bell"></i><span class="dot"></span></a>
                 <div class="dropdown">
                     <button class="admin-user" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <img src="https://picsum.photos/seed/ff-admin/80/80" width="38" height="38" alt="Admin profile photo">
                         <span class="who"><strong>{{ auth()->user()->name }}</strong><span>{{ auth()->user()->role->label() }}</span></span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        @unless (request()->routeIs('admin.docs'))
-                            <li><a class="dropdown-item" href="{{ route('admin.docs') }}"><i class="bi bi-book"></i>Admin guide</a></li>
-                        @endunless
                         <li><a class="dropdown-item" href="{{ route('home') }}"><i class="bi bi-house-door"></i>View site</a></li>
                         <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bi bi-person"></i>Profile</a></li>
                         <li><hr class="dropdown-divider"></li>

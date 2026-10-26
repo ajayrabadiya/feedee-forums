@@ -28,42 +28,75 @@
     <main id="main" class="container page">
         <div class="row g-4">
             <div class="col-lg-7">
-                <form class="panel-card" action="{{ route('contact') }}" method="post" data-demo="Thanks! Your message has been sent." data-reset>
+                <form class="panel-card" action="{{ route('contact.store') }}" method="post">
                     @csrf
                     <h2 class="section-title">Send us a message</h2>
                     <p class="section-sub">All fields are required unless marked optional.</p>
 
+                    @if ($errors->any())
+                        <div class="callout error mb-4" role="alert">
+                            <i class="bi bi-exclamation-circle"></i>
+                            <div>
+                                <strong>Please fix the highlighted fields</strong>
+                                <p>Your message hasn't been sent yet.</p>
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="contact-trap" aria-hidden="true">
+                        <label for="website">Leave this field empty</label>
+                        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    @php
+                        $selectedSubject = old('subject', request()->query('subject'));
+                    @endphp
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label" for="name">Your name</label>
-                            <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}" autocomplete="name" required maxlength="80">
+                            <input type="text" @class(['form-control', 'has-error' => $errors->has('name')]) id="name" name="name" value="{{ old('name', auth()->user()?->name) }}" autocomplete="name" required maxlength="80">
+                            @error('name')
+                                <p class="form-error" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="email">Email address</label>
-                            <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}" autocomplete="email" required>
+                            <input type="email" @class(['form-control', 'has-error' => $errors->has('email')]) id="email" name="email" value="{{ old('email', auth()->user()?->email) }}" autocomplete="email" required maxlength="255">
+                            @error('email')
+                                <p class="form-error" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="subject">Subject</label>
-                            <select class="form-select" id="subject" name="subject" required>
-                                <option value="" selected disabled>Choose a subject</option>
-                                <option>Account help</option>
-                                <option>A post or report</option>
-                                <option>Rejected post appeal</option>
-                                <option>Support &amp; payments</option>
-                                <option>Feedback or ideas</option>
-                                <option>Something else</option>
+                            <select @class(['form-select', 'has-error' => $errors->has('subject')]) id="subject" name="subject" required>
+                                <option value="" @selected(! $selectedSubject) disabled>Choose a subject</option>
+                                @foreach ($subjects as $subject)
+                                    <option value="{{ $subject }}" @selected($selectedSubject === $subject)>{{ $subject }}</option>
+                                @endforeach
                             </select>
+                            @error('subject')
+                                <p class="form-error" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div class="col-md-6">
                             <label class="form-label" for="postId">Post ID <span class="opt">(optional)</span></label>
-                            <input type="text" class="form-control" id="postId" name="post_id" value="{{ old('post_id') }}" maxlength="12" placeholder="e.g. k7Xq92Lm">
+                            <input type="text" @class(['form-control', 'has-error' => $errors->has('post_id')]) id="postId" name="post_id" value="{{ old('post_id', request()->query('post')) }}" maxlength="13" placeholder="e.g. k7Xq92Lm">
+                            @error('post_id')
+                                <p class="form-error" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div class="col-12">
                             <div class="label-row">
                                 <label class="form-label" for="message">Message</label>
                                 <span class="char-count" id="msgCount">0 / 2000</span>
                             </div>
-                            <textarea class="form-control" id="message" name="message" required maxlength="2000" placeholder="How can we help?" data-counter="#msgCount">{{ old('message') }}</textarea>
+                            <textarea @class(['form-control', 'has-error' => $errors->has('message')]) id="message" name="message" required minlength="10" maxlength="2000" placeholder="How can we help?" data-counter="#msgCount">{{ old('message') }}</textarea>
+                            @error('message')
+                                <p class="form-error" role="alert">{{ $message }}</p>
+                            @enderror
+                            @error('website')
+                                <p class="form-error" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div class="col-12">
                             <div class="turnstile" aria-label="Security check">

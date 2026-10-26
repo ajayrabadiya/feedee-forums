@@ -425,26 +425,10 @@ $(function () {
         });
     });
 
-    /* Floating support button */
-    if (!$body.hasClass('admin-body')) {
-        var $support = $(
-            '<div class="support-fab">' +
-                '<div class="support-dial" id="supportDial" role="group" aria-label="Support options">' +
-                    '<a class="support-dial-item dial-cashapp" style="--d: 1" href="https://cash.app/$zaiyaxx" target="_blank" rel="noopener nofollow">' +
-                        '<span class="support-dial-label"><strong>Cash App</strong><small>$zaiyaxx &middot; US only</small></span>' +
-                        '<span class="support-dial-icon"><i class="bi bi-currency-dollar"></i></span>' +
-                    '</a>' +
-                    '<a class="support-dial-item dial-youpay" style="--d: 0" href="https://youpay.me/zaiyaxx" target="_blank" rel="noopener nofollow">' +
-                        '<span class="support-dial-label"><strong>YouPay</strong><small>Gifts &middot; worldwide</small></span>' +
-                        '<span class="support-dial-icon"><i class="bi bi-gift-fill"></i></span>' +
-                    '</a>' +
-                '</div>' +
-                '<button type="button" class="support-fab-btn" aria-expanded="false" aria-controls="supportDial">' +
-                    '<span class="support-fab-icon"><i class="bi bi-heart-fill"></i></span><span class="support-fab-text">Support</span>' +
-                '</button>' +
-            '</div>'
-        ).appendTo($body);
+    /* Floating support button (markup and links come from Admin > Settings) */
+    var $support = $('.support-fab');
 
+    if ($support.length) {
         var $supportBtn = $support.find('.support-fab-btn');
 
         $body.addClass('has-support-fab');
