@@ -127,6 +127,8 @@ class AuthenticationTest extends TestCase
         $response->assertSee('class="user-avatar"', false);
         $response->assertSee('href="'.route('dashboard').'"><i class="bi bi-grid-1x2"></i>Dashboard', false);
         $response->assertSee('href="'.route('profile.edit').'"><i class="bi bi-person"></i>Profile', false);
+        $response->assertSee('<form method="post" action="'.route('logout').'">', false);
+        $response->assertSee('<i class="bi bi-box-arrow-right"></i>Log out</button>', false);
         $response->assertDontSee('class="btn-line">Log In', false);
         $response->assertDontSee('class="btn-fill">Sign Up', false);
     }

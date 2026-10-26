@@ -46,6 +46,13 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{{ auth()->user()->dashboardUrl() }}"><i class="bi bi-grid-1x2"></i>Dashboard</a></li>
                             <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bi bi-person"></i>Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="post" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right"></i>Log out</button>
+                                </form>
+                            </li>
                         </ul>
                     </div>
                 @else
