@@ -2,11 +2,14 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class FrontendPagesTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * @return array<string, array{string, string}>
      */

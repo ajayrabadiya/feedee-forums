@@ -218,22 +218,68 @@ $(function () {
         }
     });
 
-    /* Media uploads */
+    /* Confirm destructive actions */
+    $(document).on('submit', 'form[data-confirm]', function (e) {
+        if (!window.confirm($(this).data('confirm'))) {
+            e.preventDefault();
+        }
+    });
+
+    /* Missing media fallback */
+    function showMediaFallback(el) {
+        var $el = $(el);
+        if ($el.data('fallback-shown')) return;
+        $el.data('fallback-shown', true);
+
+        var $box = $el.is('video') ? $el : $el.closest('.gallery-main, .gallery-thumbs button, .my-post-thumb');
+        var message = $el.is('video') ? 'This video is no longer available.' : 'Image unavailable';
+        $('<span class="media-missing" role="img">')
+            .attr('aria-label', message)
+            .append('<i class="bi bi-image-alt" aria-hidden="true"></i>')
+            .append($('<span>').text(message))
+            .insertAfter($el);
+        $el.addClass('is-missing');
+        $box.addClass('has-missing-media');
+    }
+
+    $('img[data-media-fallback]').each(function () {
+        if (this.complete && this.naturalWidth === 0) showMediaFallback(this);
+    }).on('error', function () { showMediaFallback(this); });
+
+    $('video[data-media-fallback]').each(function () {
+        var video = this;
+        $(video).find('source').last().on('error', function () { showMediaFallback(video); });
+    });
+
+    /* Media uploads (limits come from the dropzone data attributes, set from config/media.php) */
     var LIMITS = {
         image: {
             types: ['image/jpeg', 'image/png', 'image/webp'],
-            maxSize: 8 * 1024 * 1024,
+            maxSize: 5 * 1024 * 1024,
             maxFiles: 10,
             label: 'JPG, PNG or WebP'
         },
         video: {
-            types: ['video/mp4', 'video/webm', 'video/quicktime'],
+            types: ['video/mp4', 'video/webm'],
             maxSize: 50 * 1024 * 1024,
-            maxFiles: 1,
+            maxFiles: 2,
             maxSeconds: 60,
-            label: 'MP4, WebM or MOV'
+            label: 'MP4 or WebM'
         }
     };
+
+    function limitsFor($zone) {
+        var base = LIMITS[$zone.data('kind')];
+        var types = $zone.data('types');
+
+        return {
+            types: types ? String(types).split(',') : base.types,
+            maxSize: Number($zone.data('max-size')) || base.maxSize,
+            maxFiles: Number($zone.data('max-files')) || base.maxFiles,
+            maxSeconds: Number($zone.data('max-seconds')) || base.maxSeconds,
+            label: $zone.data('label') || base.label
+        };
+    }
 
     function formatSize(bytes) {
         return bytes > 1048576 ? (bytes / 1048576).toFixed(1) + ' MB' : Math.round(bytes / 1024) + ' KB';
@@ -248,7 +294,7 @@ $(function () {
         var $zone = $(this);
         var input = $zone.find('input[type="file"]')[0];
         var kind = $zone.data('kind');
-        var rules = LIMITS[kind];
+        var rules = limitsFor($zone);
         var $grid = $($zone.data('preview'));
         var $error = $($zone.data('error'));
         var store = new DataTransfer();
@@ -280,6 +326,7 @@ $(function () {
 
             $item.append($media);
             $('<span class="preview-meta">').text(extra || formatSize(file.size)).appendTo($item);
+            $('<span class="preview-name">').text(file.name).attr('title', file.name).appendTo($item);
             $('<button type="button" class="preview-remove" aria-label="Remove file"><i class="bi bi-x-lg"></i></button>')
                 .on('click', function () {
                     removeFile(file);
@@ -336,7 +383,7 @@ $(function () {
                     return;
                 }
                 if (store.files.length >= rules.maxFiles) {
-                    errors.push('You can upload up to ' + rules.maxFiles + (kind === 'image' ? ' photos.' : ' video.'));
+                    errors.push('You can upload up to ' + rules.maxFiles + (kind === 'image' ? ' photos.' : (rules.maxFiles === 1 ? ' video.' : ' videos.')));
                     return;
                 }
 

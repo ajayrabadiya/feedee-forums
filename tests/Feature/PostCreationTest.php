@@ -68,10 +68,10 @@ class PostCreationTest extends TestCase
             'author_id' => $otherUser->id,
         ]));
 
-        $response->assertRedirect(route('dashboard'));
+        $post = Post::sole();
+        $response->assertRedirect(route('posts.show', $post));
         $response->assertSessionHas('status');
 
-        $post = Post::sole();
         $this->assertSame($customer->id, $post->user_id);
         $this->assertSame('My favourite cinnamon roll recipe', $post->title);
         $this->assertSame('Recipes', $post->topic);

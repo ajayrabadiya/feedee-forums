@@ -13,7 +13,7 @@ Route::view('/rules', 'pages.rules')->name('rules');
 Route::view('/contact', 'pages.contact')->name('contact');
 Route::view('/support', 'pages.support')->name('support');
 
-Route::view('/p/{post}', 'pages.post')->where('post', '[A-Za-z0-9]+')->name('posts.show');
+Route::get('/p/{post}', [PostController::class, 'show'])->where('post', '[A-Za-z0-9]+')->name('posts.show');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->middleware(StoreIntendedUrl::class)->name('login');
@@ -34,6 +34,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/create-post', [PostController::class, 'create'])->name('posts.create');
     Route::post('/create-post', [PostController::class, 'store'])->middleware('throttle:10,1')->name('posts.store');
+    Route::delete('/p/{post:public_id}', [PostController::class, 'destroy'])->name('posts.destroy');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {

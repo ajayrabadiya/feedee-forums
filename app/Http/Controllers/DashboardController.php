@@ -17,7 +17,7 @@ class DashboardController extends Controller
 
         return view('pages.dashboard', [
             'user' => $user,
-            'recentPosts' => $user->posts()->latest()->take(10)->get(),
+            'recentPosts' => $user->posts()->with('media')->latest()->take(10)->get(),
             'postCount' => $user->posts()->count(),
             'livePostCount' => $user->posts()->where('created_at', '>=', now()->subDays(Post::LIFETIME_DAYS))->count(),
         ]);

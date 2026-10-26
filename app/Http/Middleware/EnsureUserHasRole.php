@@ -25,7 +25,7 @@ class EnsureUserHasRole
 
         $allowedRoles = array_map(fn (string $role): UserRole => UserRole::from($role), $roles);
 
-        abort_unless(in_array($user->role, $allowedRoles, true), Response::HTTP_FORBIDDEN);
+        abort_unless(in_array($user->role, $allowedRoles, true), Response::HTTP_FORBIDDEN, 'You do not have permission to access this resource.');
 
         return $next($request);
     }

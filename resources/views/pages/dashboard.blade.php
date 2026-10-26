@@ -36,12 +36,32 @@
                     <p class="form-section-sub">Posts are permanently deleted {{ \App\Models\Post::LIFETIME_DAYS }} days after publishing.</p>
 
                     @forelse ($recentPosts as $post)
+                        @php
+                            $postImages = $post->media->filter->isImage();
+                            $postVideos = $post->media->filter->isVideo();
+                            $cover = $postImages->first();
+                        @endphp
                         <article class="my-post">
-                            <div>
-                                <h3>{{ $post->title }}</h3>
+                            <a href="{{ route('posts.show', $post) }}" class="my-post-thumb" tabindex="-1" aria-hidden="true">
+                                @if ($cover)
+                                    <img src="{{ $cover->url() }}" width="88" height="66" alt="" loading="lazy" decoding="async" data-media-fallback>
+                                @elseif ($postVideos->isNotEmpty())
+                                    <i class="bi bi-camera-video"></i>
+                                @else
+                                    <i class="bi bi-chat-square-text"></i>
+                                @endif
+                            </a>
+                            <div class="my-post-info">
+                                <h3><a href="{{ route('posts.show', $post) }}">{{ $post->title }}</a></h3>
                                 <p class="my-post-meta">
                                     <span class="topic">{{ $post->topic }}</span>
                                     <span><i class="bi bi-clock"></i>Posted {{ $post->created_at->diffForHumans() }}</span>
+                                    @if ($postImages->isNotEmpty())
+                                        <span><i class="bi bi-images"></i>{{ trans_choice('{1} :count photo|[2,*] :count photos', $postImages->count()) }}</span>
+                                    @endif
+                                    @if ($postVideos->isNotEmpty())
+                                        <span><i class="bi bi-camera-video"></i>{{ trans_choice('{1} :count video|[2,*] :count videos', $postVideos->count()) }}</span>
+                                    @endif
                                     @if ($post->expiresAt()->isFuture())
                                         <span><i class="bi bi-hourglass-split"></i>Deleted {{ $post->expiresAt()->diffForHumans() }}</span>
                                     @else
@@ -49,6 +69,11 @@
                                     @endif
                                 </p>
                             </div>
+                            <form method="post" action="{{ route('posts.destroy', $post) }}" class="my-post-delete" data-confirm="Delete this post and all of its photos and videos? This can't be undone.">
+                                @csrf
+                                @method('delete')
+                                <button type="submit" class="icon-btn" aria-label="Delete post: {{ $post->title }}" title="Delete post"><i class="bi bi-trash3"></i></button>
+                            </form>
                         </article>
                     @empty
                         <div class="my-post-empty">

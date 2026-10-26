@@ -19,14 +19,14 @@
                 <form class="panel-card" id="postForm" action="{{ route('posts.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <h1 class="section-title">Create a post</h1>
-                    <p class="section-sub">Share a story, a few photos or a short video. Keep it kind and follow the community rules.</p>
+                    <p class="section-sub">Share a story, a few photos or short videos. Keep it kind and follow the community rules.</p>
 
                     @if ($errors->any())
                         <div class="callout error mb-4" role="alert">
                             <i class="bi bi-exclamation-circle"></i>
                             <div>
-                                <strong>Please fix the highlighted fields</strong>
-                                <p>Your post hasn't been published yet.</p>
+                                <strong>{{ $errors->first('media') ?: 'Please fix the highlighted fields' }}</strong>
+                                <p>Your post hasn't been published yet. For security, browsers don't keep selected files, so please attach your photos and videos again.</p>
                             </div>
                         </div>
                     @endif
@@ -68,31 +68,36 @@
                         </div>
                     </div>
 
-                    <div class="form-section">
-                        <h2 class="form-section-title">Photos</h2>
-                        <p class="form-section-sub">Up to 10 photos. JPG, PNG or WebP, 8 MB max each. Add a short description to each photo so everyone can enjoy it.</p>
+                    @php
+                        $photoErrors = collect($errors->get('photos*'))->merge($errors->get('alt_text*'))->flatten()->unique();
+                        $videoErrors = collect($errors->get('videos*'))->flatten()->unique();
+                    @endphp
 
-                        <label class="dropzone" data-kind="image" data-preview="#photoPreview" data-error="#photoError">
-                            <input type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple aria-describedby="photoError">
+                    <div class="form-section">
+                        <h2 class="form-section-title">Photos <span class="opt">(optional)</span></h2>
+                        <p class="form-section-sub">Up to {{ $images['max_files'] }} photos. {{ $images['label'] }}, {{ \App\Http\Requests\StorePostRequest::formatKb($images['max_kb']) }} max each. Add a short description to each photo so everyone can enjoy it.</p>
+
+                        <label @class(['dropzone', 'has-error' => $photoErrors->isNotEmpty()]) data-kind="image" data-preview="#photoPreview" data-error="#photoError" data-max-files="{{ $images['max_files'] }}" data-max-size="{{ $images['max_kb'] * 1024 }}" data-types="{{ implode(',', $images['mime_types']) }}" data-label="{{ $images['label'] }}">
+                            <input type="file" name="photos[]" accept="{{ implode(',', $images['mime_types']) }}" multiple aria-describedby="photoError">
                             <span class="dz-icon"><i class="bi bi-images"></i></span>
                             <strong>Drag photos here or <span>browse</span></strong>
-                            <small>Photos are resized and stripped of location data automatically</small>
+                            <small>Remove location data from photos before sharing them</small>
                         </label>
-                        <div class="upload-error" id="photoError" aria-live="polite">@foreach ($errors->get('photos*') as $messages)@foreach ($messages as $message)<div>{{ $message }}</div>@endforeach @endforeach</div>
+                        <div class="upload-error" id="photoError" aria-live="polite">@foreach ($photoErrors as $message)<div>{{ $message }}</div>@endforeach</div>
                         <div class="preview-grid" id="photoPreview"></div>
                     </div>
 
                     <div class="form-section">
-                        <h2 class="form-section-title">Short video</h2>
-                        <p class="form-section-sub">One video up to 60 seconds. MP4, WebM or MOV, 50 MB max.</p>
+                        <h2 class="form-section-title">Short videos <span class="opt">(optional)</span></h2>
+                        <p class="form-section-sub">Up to {{ $videos['max_files'] }} videos, {{ $videos['max_seconds'] }} seconds or shorter each. {{ $videos['label'] }}, {{ \App\Http\Requests\StorePostRequest::formatKb($videos['max_kb']) }} max each.</p>
 
-                        <label class="dropzone" data-kind="video" data-preview="#videoPreview" data-error="#videoError">
-                            <input type="file" name="video" accept="video/mp4,video/webm,video/quicktime" aria-describedby="videoError">
+                        <label @class(['dropzone', 'has-error' => $videoErrors->isNotEmpty()]) data-kind="video" data-preview="#videoPreview" data-error="#videoError" data-max-files="{{ $videos['max_files'] }}" data-max-size="{{ $videos['max_kb'] * 1024 }}" data-max-seconds="{{ $videos['max_seconds'] }}" data-types="{{ implode(',', $videos['mime_types']) }}" data-label="{{ $videos['label'] }}">
+                            <input type="file" name="videos[]" accept="{{ implode(',', $videos['mime_types']) }}" multiple aria-describedby="videoError">
                             <span class="dz-icon"><i class="bi bi-camera-video"></i></span>
-                            <strong>Drag a video here or <span>browse</span></strong>
-                            <small>A thumbnail is generated for the feed after upload</small>
+                            <strong>Drag videos here or <span>browse</span></strong>
+                            <small>Videos play right inside your post</small>
                         </label>
-                        <div class="upload-error" id="videoError" aria-live="polite">@error('video')<div>{{ $message }}</div>@enderror</div>
+                        <div class="upload-error" id="videoError" aria-live="polite">@foreach ($videoErrors as $message)<div>{{ $message }}</div>@endforeach</div>
                         <div class="preview-grid" id="videoPreview"></div>
                     </div>
 

@@ -2635,14 +2635,51 @@ textarea.form-control {
 }
 
 .my-post {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
     padding: 14px 0;
     border-top: 1px solid var(--line);
+}
+
+.my-post-thumb {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: 0 0 88px;
+    height: 66px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--muted);
+    font-size: 22px;
+}
+
+.my-post-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.my-post-info {
+    flex: 1;
+    min-width: 0;
 }
 
 .my-post h3 {
     margin-bottom: 6px;
     font-size: 15px;
     font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.my-post h3 a:hover {
+    color: var(--primary);
+}
+
+.my-post-delete .icon-btn:hover {
+    color: var(--danger);
+    background: #fdeeee;
 }
 
 .my-post-meta {
@@ -2691,6 +2728,99 @@ textarea.form-control {
 .account-details dd {
     margin-bottom: 10px;
     word-break: break-word;
+}
+
+/* Post media */
+.avatar-icon {
+    display: inline-grid;
+    place-items: center;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-size: 18px;
+}
+
+.author-card .avatar-icon {
+    color: var(--primary);
+    font-size: 24px;
+}
+
+.form-section-title .opt {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.dropzone.has-error {
+    border-color: var(--danger);
+}
+
+.preview-name {
+    display: block;
+    padding: 6px 10px 0;
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.preview-item video + .preview-meta + .preview-name {
+    padding-bottom: 8px;
+}
+
+.media-missing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    height: 100%;
+    min-height: 60px;
+    padding: 12px;
+    color: #9a9a9a;
+    font-size: 13px;
+    text-align: center;
+}
+
+.media-missing i {
+    font-size: 24px;
+}
+
+.my-post-thumb .media-missing span,
+.gallery-thumbs .media-missing span {
+    display: none;
+}
+
+.video-wrap .media-missing {
+    border-radius: 14px;
+    background: #111;
+    aspect-ratio: 16 / 9;
+}
+
+img.is-missing,
+video.is-missing {
+    display: none;
+}
+
+.gallery-main.has-missing-media {
+    display: grid;
+    place-items: center;
+}
+
+@media (max-width: 575.98px) {
+    .error-page {
+        padding: 56px 0 72px;
+    }
+
+    .error-code {
+        font-size: 84px;
+    }
+
+    .error-page .btn-fill,
+    .error-page .btn-soft {
+        flex: 1 1 100%;
+    }
 }
 
 /* Responsive */
