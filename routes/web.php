@@ -8,7 +8,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\StoreIntendedUrl;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'pages.home')->name('home');
+Route::get('/', [PostController::class, 'index'])->name('home');
 Route::view('/rules', 'pages.rules')->name('rules');
 Route::view('/contact', 'pages.contact')->name('contact');
 Route::view('/support', 'pages.support')->name('support');

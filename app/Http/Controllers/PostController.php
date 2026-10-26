@@ -21,6 +21,41 @@ use Throwable;
 
 class PostController extends Controller
 {
+    /**
+     * Number of posts shown per feed page.
+     */
+    private const PER_PAGE = 20;
+
+    /**
+     * Home page feed: live posts, newest first, with optional search and topic filter.
+     */
+    public function index(Request $request): View
+    {
+        $search = is_string($request->query('q')) ? Str::limit(trim($request->query('q')), 100, '') : '';
+        $topic = in_array($request->query('topic'), Post::TOPICS, true) ? $request->query('topic') : null;
+
+        $posts = Post::query()
+            ->live()
+            ->with(['user', 'media'])
+            ->when($topic, fn ($query) => $query->where('topic', $topic))
+            ->when($search !== '', function ($query) use ($search): void {
+                $like = '%'.addcslashes($search, '%_\\').'%';
+
+                $query->where(fn ($query) => $query->where('title', 'like', $like)->orWhere('body', 'like', $like));
+            })
+            ->latest()
+            ->latest('id')
+            ->paginate(self::PER_PAGE)
+            ->withQueryString();
+
+        return view('pages.home', [
+            'posts' => $posts,
+            'search' => $search,
+            'topic' => $topic,
+            'topicStyles' => Post::TOPIC_STYLES,
+        ]);
+    }
+
     public function create(): View
     {
         return view('pages.create-post', [

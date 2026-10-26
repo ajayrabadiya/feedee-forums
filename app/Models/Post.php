@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\MediaType;
 use Database\Factories\PostFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -31,6 +32,20 @@ class Post extends Model
         'Art & Stories',
         'Outdoors',
         'Introductions',
+    ];
+
+    /**
+     * Colour class and icon used for each topic in the feed.
+     *
+     * @var array<string, array{color: string, icon: string}>
+     */
+    public const TOPIC_STYLES = [
+        'Recipes' => ['color' => 't-amber', 'icon' => 'bi-cup-hot'],
+        'The Lounge' => ['color' => 't-purple', 'icon' => 'bi-chat-dots'],
+        'Meetups' => ['color' => 't-blue', 'icon' => 'bi-calendar-event'],
+        'Art & Stories' => ['color' => 't-pink', 'icon' => 'bi-palette'],
+        'Outdoors' => ['color' => 't-green', 'icon' => 'bi-tree'],
+        'Introductions' => ['color' => 't-orange', 'icon' => 'bi-emoji-smile'],
     ];
 
     /**
@@ -99,6 +114,21 @@ class Post extends Model
     public function videos(): HasMany
     {
         return $this->media()->where('media_type', MediaType::Video);
+    }
+
+    /**
+     * Only posts still inside their 30-day lifetime.
+     *
+     * @param  Builder<Post>  $query
+     */
+    public function scopeLive(Builder $query): void
+    {
+        $query->where('created_at', '>=', now()->subDays(self::LIFETIME_DAYS));
+    }
+
+    public function topicColor(): string
+    {
+        return self::TOPIC_STYLES[$this->topic]['color'] ?? 't-orange';
     }
 
     /**
