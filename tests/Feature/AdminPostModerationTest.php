@@ -210,7 +210,7 @@ class AdminPostModerationTest extends TestCase
 
         $this->assertModelExists($post);
         $this->assertSame(PostStatus::Pending, $post->fresh()->status);
-        $this->assertFalse(Setting::requiresPostApproval());
+        $this->assertNull(Setting::get(Setting::REQUIRE_POST_APPROVAL));
     }
 
     public function test_admin_can_toggle_require_approval_setting(): void

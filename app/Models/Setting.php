@@ -25,6 +25,6 @@ class Setting extends Model
 
     public static function requiresPostApproval(): bool
     {
-        return static::get(self::REQUIRE_POST_APPROVAL, '0') === '1';
+        return static::get(self::REQUIRE_POST_APPROVAL, '1') === '1';
     }
 }

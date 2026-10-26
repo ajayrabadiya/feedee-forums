@@ -13,9 +13,55 @@ class PostVisibilityTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_existing_and_new_posts_are_approved_when_approval_is_off(): void
+    public function test_approval_is_required_by_default(): void
     {
         $user = User::factory()->create();
+
+        $this->assertTrue(Setting::requiresPostApproval());
+
+        $this->actingAs($user)->get(route('posts.create'))
+            ->assertSee('Reviewed by a moderator')
+            ->assertSee('Submit for review');
+
+        $this->actingAs($user)->post(route('posts.store'), [
+            'title' => 'Default review', 'topic' => 'Recipes', 'agree' => '1',
+        ])->assertSessionHas('status', 'Thanks for sharing! Your post will appear in the feed once a moderator approves it.');
+
+        $post = Post::sole();
+        $this->assertSame(PostStatus::Pending, $post->status);
+
+        auth()->logout();
+        $this->get(route('home'))->assertDontSee('Default review');
+        $this->get(route('posts.show', $post))->assertNotFound();
+    }
+
+    public function test_post_appears_on_the_frontend_after_admin_approval(): void
+    {
+        $author = User::factory()->create();
+
+        $this->actingAs($author)->post(route('posts.store'), [
+            'title' => 'Waiting for the admin', 'topic' => 'Recipes', 'agree' => '1',
+        ]);
+        $post = Post::sole();
+
+        auth()->logout();
+        $this->get(route('home'))->assertDontSee('Waiting for the admin');
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->postJson(route('admin.posts.moderate'), ['action' => 'approve', 'ids' => [$post->id]])
+            ->assertOk();
+
+        auth()->logout();
+        $this->get(route('home'))->assertSee('Waiting for the admin');
+        $this->get(route('posts.show', $post))->assertOk()->assertDontSee('Waiting for review');
+    }
+
+    public function test_new_posts_go_live_immediately_when_approval_is_turned_off(): void
+    {
+        Setting::set(Setting::REQUIRE_POST_APPROVAL, '0');
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->get(route('posts.create'))->assertSee('Publish post');
 
         $this->actingAs($user)->post(route('posts.store'), [
             'title' => 'Instant post', 'topic' => 'Recipes', 'agree' => '1',

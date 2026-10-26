@@ -192,7 +192,7 @@
                             <button type="submit" class="btn-fill"><i class="bi bi-check-lg"></i>Save changes</button>
                         @else
                             <a href="{{ route('home') }}" class="btn-soft">Cancel</a>
-                            <button type="submit" class="btn-fill"><i class="bi bi-send"></i>Publish post</button>
+                            <button type="submit" class="btn-fill"><i class="bi bi-send"></i>{{ ($requiresApproval ?? false) ? 'Submit for review' : 'Publish post' }}</button>
                         @endif
                     </div>
                 </form>
@@ -214,8 +214,13 @@
                         <div class="box">
                             <div class="box-head"><i class="bi bi-signpost-split"></i>What happens next</div>
                             <ol class="lifecycle">
-                                <li><span class="step-icon"><i class="bi bi-broadcast"></i></span><div><strong>Live in the feed</strong><span>Appears at the top of the latest posts</span></div></li>
-                                <li><span class="step-icon"><i class="bi bi-shield-check"></i></span><div><strong>Moderators keep watch</strong><span>Posts that break the rules are removed</span></div></li>
+                                @if ($requiresApproval ?? false)
+                                    <li><span class="step-icon"><i class="bi bi-shield-check"></i></span><div><strong>Reviewed by a moderator</strong><span>Your post waits for approval before anyone else can see it</span></div></li>
+                                    <li><span class="step-icon"><i class="bi bi-broadcast"></i></span><div><strong>Live in the feed</strong><span>Appears in the latest posts once approved</span></div></li>
+                                @else
+                                    <li><span class="step-icon"><i class="bi bi-broadcast"></i></span><div><strong>Live in the feed</strong><span>Appears at the top of the latest posts</span></div></li>
+                                    <li><span class="step-icon"><i class="bi bi-shield-check"></i></span><div><strong>Moderators keep watch</strong><span>Posts that break the rules are removed</span></div></li>
+                                @endif
                                 <li><span class="step-icon"><i class="bi bi-calendar2-x"></i></span><div><strong>Deleted after 30 days</strong><span>Post and media removed permanently</span></div></li>
                             </ol>
                         </div>

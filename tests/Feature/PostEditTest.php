@@ -357,6 +357,7 @@ class PostEditTest extends TestCase
         $response->assertSee('action="'.route('posts.store').'"', false);
         $response->assertDontSee('name="_method"', false);
         $response->assertDontSee('remove_media', false);
-        $response->assertSee('Publish post');
+        $response->assertSee('Submit for review');
+        $response->assertDontSee('Save changes');
     }
 }

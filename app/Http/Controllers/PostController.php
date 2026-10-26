@@ -66,9 +66,10 @@ class PostController extends Controller
         ]);
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
         return view('pages.create-post', [
+            'requiresApproval' => Setting::requiresPostApproval() && ! $request->user()->isAdmin(),
             'topics' => Post::TOPICS,
             'images' => config('media.images'),
             'videos' => config('media.videos'),
