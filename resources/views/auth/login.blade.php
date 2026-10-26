@@ -22,14 +22,17 @@
     <h1>Log in</h1>
     <p class="lead-sm">Welcome back! Enter your details to continue.</p>
 
-    <form action="{{ route('login') }}" method="post" data-demo="Logged in successfully (design preview).">
+    <form action="{{ route('login.store') }}" method="post">
         @csrf
         <div class="mb-3">
             <label class="form-label" for="email">Email or username</label>
             <div class="input-icon">
                 <i class="bi bi-person"></i>
-                <input type="text" class="form-control" id="email" name="login" value="{{ old('login') }}" autocomplete="username" required placeholder="you@example.com">
+                <input type="text" @class(['form-control', 'has-error' => $errors->has('login')]) id="email" name="login" value="{{ old('login') }}" autocomplete="username" required autofocus placeholder="you@example.com" @error('login') aria-invalid="true" aria-describedby="loginError" @enderror>
             </div>
+            @error('login')
+                <p class="form-error" id="loginError" role="alert">{{ $message }}</p>
+            @enderror
         </div>
 
         <div class="mb-3">
@@ -39,13 +42,16 @@
             </div>
             <div class="input-icon">
                 <i class="bi bi-lock"></i>
-                <input type="password" class="form-control" id="password" name="password" autocomplete="current-password" required placeholder="Enter your password">
+                <input type="password" @class(['form-control', 'has-error' => $errors->has('password')]) id="password" name="password" autocomplete="current-password" required placeholder="Enter your password" @error('password') aria-invalid="true" aria-describedby="passwordError" @enderror>
                 <button type="button" class="icon-btn toggle-pass" aria-label="Show password"><i class="bi bi-eye"></i></button>
             </div>
+            @error('password')
+                <p class="form-error" id="passwordError" role="alert">{{ $message }}</p>
+            @enderror
         </div>
 
         <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="remember" name="remember">
+            <input class="form-check-input" type="checkbox" id="remember" name="remember" value="1" @checked(old('remember'))>
             <label class="form-check-label" for="remember">Keep me logged in</label>
         </div>
 

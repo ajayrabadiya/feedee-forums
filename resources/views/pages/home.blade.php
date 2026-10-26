@@ -43,7 +43,11 @@
                     <h1>Share the moments that make your day a little better.</h1>
                     <p>Post photos, short videos and stories with a kind, welcoming community. Every post stays live for 30 days.</p>
                     <div class="welcome-btns">
-                        <a href="{{ route('register') }}" class="btn-fill">Join the community</a>
+                        @auth
+                            <a href="{{ route('posts.create') }}" class="btn-fill">Create a post</a>
+                        @else
+                            <a href="{{ route('register', ['redirect' => request()->getRequestUri()]) }}" class="btn-fill">Join the community</a>
+                        @endauth
                         <a href="{{ route('rules') }}" class="btn-line">Read the rules</a>
                     </div>
                 </section>

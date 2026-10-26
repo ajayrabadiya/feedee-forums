@@ -24,7 +24,12 @@
                     Last cleanup today at 03:00<br>Next run in 3h 42m
                 </div>
                 <ul class="side-nav">
-                    <li><a href="{{ route('login') }}"><i class="bi bi-box-arrow-left"></i>Log out</a></li>
+                    <li>
+                        <form method="post" action="{{ route('logout') }}">
+                            @csrf
+                            <a href="{{ route('logout') }}" data-logout><i class="bi bi-box-arrow-left"></i>Log out</a>
+                        </form>
+                    </li>
                 </ul>
             </div>
         </aside>

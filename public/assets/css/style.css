@@ -2571,6 +2571,128 @@ textarea.form-control {
     color: #ff7b7b;
 }
 
+/* Account menu */
+.user-avatar {
+    display: inline-grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: 1px solid #444;
+    border-radius: 50%;
+    background: #262626;
+    color: #fff;
+    font-size: 18px;
+    transition: border-color .2s, background-color .2s;
+}
+
+.user-avatar:hover,
+.user-avatar[aria-expanded="true"] {
+    border-color: var(--primary);
+    background: rgba(255, 87, 34, .18);
+}
+
+.user-avatar:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.user-menu .dropdown-menu {
+    margin-top: 10px !important;
+}
+
+/* Form validation */
+.form-error {
+    margin: 6px 0 0;
+    color: var(--danger);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.form-control.has-error,
+.form-select.has-error {
+    border-color: var(--danger);
+}
+
+.form-control.has-error:focus,
+.form-select.has-error:focus {
+    box-shadow: 0 0 0 4px rgba(226, 61, 61, .12);
+}
+
+.callout.error {
+    border-color: rgba(226, 61, 61, .25);
+    background: #fdeeee;
+}
+
+.callout.error>i {
+    color: var(--danger);
+}
+
+/* Account dashboard & profile */
+.account-stats {
+    grid-template-columns: repeat(3, 1fr);
+    margin: 0;
+}
+
+.my-post {
+    padding: 14px 0;
+    border-top: 1px solid var(--line);
+}
+
+.my-post h3 {
+    margin-bottom: 6px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.my-post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 14px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.my-post-meta i {
+    margin-right: 4px;
+}
+
+.my-post-empty {
+    padding: 28px 16px;
+    border: 1px dashed var(--line);
+    border-radius: 12px;
+    text-align: center;
+    color: var(--muted);
+}
+
+.my-post-empty > i {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--primary);
+    font-size: 26px;
+}
+
+.my-post-empty p {
+    margin-bottom: 14px;
+}
+
+.account-details {
+    margin-bottom: 16px;
+}
+
+.account-details dt {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.account-details dd {
+    margin-bottom: 10px;
+    word-break: break-word;
+}
+
 /* Responsive */
 @media (max-width: 1199.98px) {
     .main-nav > a,

@@ -16,10 +16,20 @@
 
         <div class="row g-4">
             <div class="col-lg-8">
-                <form class="panel-card" id="postForm" action="{{ route('posts.create') }}" method="post" enctype="multipart/form-data" data-demo="Thanks for sharing! Your post has been published." data-reset>
+                <form class="panel-card" id="postForm" action="{{ route('posts.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <h1 class="section-title">Create a post</h1>
                     <p class="section-sub">Share a story, a few photos or a short video. Keep it kind and follow the community rules.</p>
+
+                    @if ($errors->any())
+                        <div class="callout error mb-4" role="alert">
+                            <i class="bi bi-exclamation-circle"></i>
+                            <div>
+                                <strong>Please fix the highlighted fields</strong>
+                                <p>Your post hasn't been published yet.</p>
+                            </div>
+                        </div>
+                    @endif
 
                     <div class="form-section">
                         <div class="mb-3">
@@ -27,20 +37,23 @@
                                 <label class="form-label" for="title">Title</label>
                                 <span class="char-count" id="titleCount">0 / 150</span>
                             </div>
-                            <input type="text" class="form-control" id="title" name="title" value="{{ old('title') }}" maxlength="150" required placeholder="Give your post a clear, friendly title" data-counter="#titleCount">
+                            <input type="text" @class(['form-control', 'has-error' => $errors->has('title')]) id="title" name="title" value="{{ old('title') }}" maxlength="150" required placeholder="Give your post a clear, friendly title" data-counter="#titleCount">
+                            @error('title')
+                                <p class="form-error" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label" for="topic">Topic</label>
-                            <select class="form-select" id="topic" name="topic" required>
-                                <option value="" selected disabled>Choose a topic</option>
-                                <option>Recipes</option>
-                                <option>The Lounge</option>
-                                <option>Meetups</option>
-                                <option>Art &amp; Stories</option>
-                                <option>Outdoors</option>
-                                <option>Introductions</option>
+                            <select @class(['form-select', 'has-error' => $errors->has('topic')]) id="topic" name="topic" required>
+                                <option value="" @selected(! old('topic')) disabled>Choose a topic</option>
+                                @foreach ($topics as $topic)
+                                    <option value="{{ $topic }}" @selected(old('topic') === $topic)>{{ $topic }}</option>
+                                @endforeach
                             </select>
+                            @error('topic')
+                                <p class="form-error" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div>
@@ -48,7 +61,10 @@
                                 <label class="form-label" for="body">Your post <span class="opt">(optional)</span></label>
                                 <span class="char-count" id="bodyCount">0 / 3000</span>
                             </div>
-                            <textarea class="form-control" id="body" name="body" maxlength="3000" placeholder="What would you like to share?" data-counter="#bodyCount">{{ old('body') }}</textarea>
+                            <textarea @class(['form-control', 'has-error' => $errors->has('body')]) id="body" name="body" maxlength="3000" placeholder="What would you like to share?" data-counter="#bodyCount">{{ old('body') }}</textarea>
+                            @error('body')
+                                <p class="form-error" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 
@@ -62,7 +78,7 @@
                             <strong>Drag photos here or <span>browse</span></strong>
                             <small>Photos are resized and stripped of location data automatically</small>
                         </label>
-                        <div class="upload-error" id="photoError" aria-live="polite"></div>
+                        <div class="upload-error" id="photoError" aria-live="polite">@foreach ($errors->get('photos*') as $messages)@foreach ($messages as $message)<div>{{ $message }}</div>@endforeach @endforeach</div>
                         <div class="preview-grid" id="photoPreview"></div>
                     </div>
 
@@ -76,7 +92,7 @@
                             <strong>Drag a video here or <span>browse</span></strong>
                             <small>A thumbnail is generated for the feed after upload</small>
                         </label>
-                        <div class="upload-error" id="videoError" aria-live="polite"></div>
+                        <div class="upload-error" id="videoError" aria-live="polite">@error('video')<div>{{ $message }}</div>@enderror</div>
                         <div class="preview-grid" id="videoPreview"></div>
                     </div>
 
@@ -89,8 +105,11 @@
                             </div>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="agree" required>
+                            <input class="form-check-input" type="checkbox" id="agree" name="agree" value="1" required @checked(old('agree'))>
                             <label class="form-check-label" for="agree">I've read the <a href="{{ route('rules') }}">community rules</a> and I own or have permission to share this media.</label>
+                            @error('agree')
+                                <p class="form-error" role="alert">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 

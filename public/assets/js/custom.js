@@ -201,6 +201,12 @@ $(function () {
         this.setCustomValidity(this.value && this.value !== original ? 'Passwords do not match.' : '');
     });
 
+    /* Log out links submit their surrounding POST form */
+    $(document).on('click', '[data-logout]', function (e) {
+        e.preventDefault();
+        $(this).closest('form').trigger('submit');
+    });
+
     /* Demo forms (static design only) */
     $('form[data-demo]').on('submit', function (e) {
         e.preventDefault();

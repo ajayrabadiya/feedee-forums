@@ -24,8 +24,13 @@
                 <div>
                     <h4>Account</h4>
                     <ul class="footer-links">
-                        <li><a href="{{ route('login') }}">Log in</a></li>
-                        <li><a href="{{ route('register') }}">Sign up</a></li>
+                        @auth
+                            <li><a href="{{ auth()->user()->dashboardUrl() }}">Dashboard</a></li>
+                            <li><a href="{{ route('profile.edit') }}">Profile</a></li>
+                        @else
+                            <li><a href="{{ route('login', ['redirect' => request()->getRequestUri()]) }}">Log in</a></li>
+                            <li><a href="{{ route('register', ['redirect' => request()->getRequestUri()]) }}">Sign up</a></li>
+                        @endauth
                         <li><a href="{{ asset('sitemap.xml') }}">Sitemap</a></li>
                     </ul>
                 </div>

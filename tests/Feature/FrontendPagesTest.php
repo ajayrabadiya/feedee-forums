@@ -17,7 +17,6 @@ class FrontendPagesTest extends TestCase
             'rules' => ['/rules', 'Community Rules'],
             'contact' => ['/contact', 'Get in touch'],
             'support' => ['/support', 'Support Feedee Forums'],
-            'create post' => ['/create-post', 'Create a post'],
             'single post' => ['/p/k7Xq92Lm', 'cinnamon roll recipe right'],
             'login' => ['/login', 'Log in'],
             'register' => ['/register', 'Create your account'],
