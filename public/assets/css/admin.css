@@ -176,6 +176,10 @@
     font-size: 12px;
 }
 
+.admin-top > .dropdown {
+    margin-left: auto;
+}
+
 .side-toggle {
     display: none;
     place-items: center;
@@ -1301,7 +1305,6 @@ a.stat-card:hover {
         padding: 0 16px;
     }
 
-    .admin-top .admin-search,
     .admin-user .who {
         display: none;
     }
