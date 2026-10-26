@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Post;
+use App\Rules\NoUrls;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -28,7 +29,7 @@ class StorePostRequest extends FormRequest
         $videos = config('media.videos');
 
         return [
-            'title' => ['required', 'string', 'max:150'],
+            'title' => ['required', 'string', 'max:150', new NoUrls('Links aren\'t allowed in the title. Describe your post in words instead.')],
             'topic' => ['required', 'string', Rule::in(Post::TOPICS)],
             'body' => ['nullable', 'string', 'max:3000'],
             'photos' => ['nullable', 'array', 'max:'.$images['max_files']],

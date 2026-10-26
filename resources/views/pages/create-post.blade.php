@@ -54,10 +54,11 @@
                                 <label class="form-label" for="title">Title</label>
                                 <span class="char-count" id="titleCount">0 / 150</span>
                             </div>
-                            <input type="text" @class(['form-control', 'has-error' => $errors->has('title')]) id="title" name="title" value="{{ old('title', $editing ? $post->title : null) }}" maxlength="150" required placeholder="Give your post a clear, friendly title" data-counter="#titleCount">
+                            <input type="text" @class(['form-control', 'has-error' => $errors->has('title')]) id="title" name="title" value="{{ old('title', $editing ? $post->title : null) }}" maxlength="150" required placeholder="Give your post a clear, friendly title" data-counter="#titleCount" data-no-urls="{{ \App\Rules\NoUrls::PATTERN }}" data-no-urls-message="Links aren't allowed in the title. Describe your post in words instead." aria-describedby="titleUrlError">
                             @error('title')
                                 <p class="form-error" role="alert">{{ $message }}</p>
                             @enderror
+                            <p class="form-error" id="titleUrlError" aria-live="polite" hidden></p>
                         </div>
 
                         @php
