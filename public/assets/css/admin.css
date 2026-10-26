@@ -674,6 +674,69 @@
     font-size: 12px;
 }
 
+/* Contact messages */
+.cell-message {
+    display: block;
+    min-width: 240px;
+    max-width: 460px;
+}
+
+.cell-message strong {
+    display: block;
+    font-weight: 500;
+}
+
+.cell-message small {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.cell-message:hover strong {
+    color: var(--primary);
+}
+
+.admin-table tr.is-unread .cell-message strong,
+.admin-table tr.is-unread .cell-customer strong {
+    font-weight: 700;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 16px;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.back-link:hover {
+    color: var(--primary);
+}
+
+.contact-body {
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.contact-actions {
+    justify-content: flex-start;
+}
+
+.contact-details dt {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.contact-details dd {
+    margin-bottom: 12px;
+    overflow-wrap: anywhere;
+}
+
 .cell-email:hover {
     color: var(--primary);
 }

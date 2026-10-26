@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Enums\PostStatus;
+use App\Models\ContactMessage;
 use App\Models\Post;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -24,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
     {
         View::composer('admin.partials.sidebar', function ($view): void {
             $view->with('pendingPostsCount', Post::query()->where('status', PostStatus::Pending)->count());
+            $view->with('unreadContactsCount', ContactMessage::query()->unread()->count());
         });
     }
 }

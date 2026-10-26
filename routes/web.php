@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\PostModerationController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
@@ -13,7 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PostController::class, 'index'])->name('home');
 Route::view('/rules', 'pages.rules')->name('rules');
-Route::view('/contact', 'pages.contact')->name('contact');
+Route::get('/contact', [ContactController::class, 'show'])->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contact.store');
 Route::view('/support', 'pages.support')->name('support');
 
 Route::get('/p/{post}', [PostController::class, 'show'])->where('post', '[A-Za-z0-9]+')->name('posts.show');
@@ -49,5 +52,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::put('/settings/post-approval', [SettingController::class, 'updatePostApproval'])->name('settings.post-approval');
     Route::view('/reports', 'admin.reports')->name('reports');
     Route::get('/customers', CustomerController::class)->name('customers');
+    Route::get('/contacts', [ContactMessageController::class, 'index'])->name('contacts.index');
+    Route::get('/contacts/{contactMessage}', [ContactMessageController::class, 'show'])->name('contacts.show');
+    Route::patch('/contacts/{contactMessage}', [ContactMessageController::class, 'update'])->name('contacts.update');
+    Route::delete('/contacts/{contactMessage}', [ContactMessageController::class, 'destroy'])->name('contacts.destroy');
     Route::view('/docs', 'admin.docs')->name('docs');
 });

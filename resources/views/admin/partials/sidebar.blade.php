@@ -15,6 +15,7 @@
             <div class="side-label">Community</div>
             <ul class="side-nav">
                 <li><a href="{{ route('admin.customers') }}"@if (request()->routeIs('admin.customers')) class="active" aria-current="page"@endif><i class="bi bi-people"></i>Customers</a></li>
+                <li><a href="{{ route('admin.contacts.index') }}"@if (request()->routeIs('admin.contacts.*')) class="active" aria-current="page"@endif><i class="bi bi-envelope"></i>Contact messages @if ($unreadContactsCount)<span class="count hot" title="Unread messages">{{ $unreadContactsCount }}</span>@endif</a></li>
             </ul>
 
             <div class="side-label">Help</div>
