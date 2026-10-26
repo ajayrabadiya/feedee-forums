@@ -17,6 +17,11 @@
                 <li><a href="{{ route('admin.contacts.index') }}"@if (request()->routeIs('admin.contacts.*')) class="active" aria-current="page"@endif><i class="bi bi-envelope"></i>Contact messages @if ($unreadContactsCount)<span class="count hot" title="Unread messages">{{ $unreadContactsCount }}</span>@endif</a></li>
             </ul>
 
+            <div class="side-label">System</div>
+            <ul class="side-nav">
+                <li><a href="{{ route('admin.settings') }}"@if (request()->routeIs('admin.settings')) class="active" aria-current="page"@endif><i class="bi bi-gear"></i>Settings</a></li>
+            </ul>
+
             <div class="side-foot">
                 <div class="cron-mini">
                     <strong><span class="dot-live"></span>Scheduler running</strong>

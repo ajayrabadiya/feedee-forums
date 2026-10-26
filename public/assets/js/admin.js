@@ -404,6 +404,11 @@ $(function () {
         });
     });
 
+    /* Settings: only show SMTP fields when SMTP is selected */
+    $('[data-smtp-toggle]').on('change', function () {
+        $('.smtp-fields').prop('hidden', this.value !== 'smtp');
+    });
+
     /* Manual cleanup trigger */
     $('[data-run-cleanup]').on('click', function () {
         var $btn = $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>Running');

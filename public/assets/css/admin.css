@@ -678,6 +678,66 @@
     font-size: 12px;
 }
 
+/* Settings */
+.settings-panel .panel-head h2 {
+    display: flex;
+    align-items: center;
+}
+
+.settings-panel .form-control,
+.settings-panel .form-select {
+    min-height: 42px;
+}
+
+.setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+}
+
+.setting-row .form-switch .form-check-input {
+    width: 44px;
+    height: 24px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.settings-group {
+    padding: 16px;
+    margin-bottom: 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+
+.settings-group legend {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    float: none;
+    width: auto;
+    padding: 0 6px;
+    margin: 0 0 6px -6px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.settings-group legend i {
+    color: var(--primary);
+}
+
+.test-mail-row {
+    display: flex;
+    gap: 10px;
+}
+
+.test-mail-row .form-control {
+    flex: 1;
+}
+
 /* Contact messages */
 .cell-message {
     display: block;

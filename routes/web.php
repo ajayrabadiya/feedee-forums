@@ -51,6 +51,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/posts', [PostModerationController::class, 'index'])->name('posts');
     Route::post('/posts/moderate', [PostModerationController::class, 'moderate'])->middleware('throttle:60,1')->name('posts.moderate');
     Route::put('/settings/post-approval', [SettingController::class, 'updatePostApproval'])->name('settings.post-approval');
+    Route::get('/settings', [SettingController::class, 'edit'])->name('settings');
+    Route::put('/settings/support', [SettingController::class, 'updateSupport'])->name('settings.support');
+    Route::put('/settings/mail', [SettingController::class, 'updateMail'])->name('settings.mail');
+    Route::post('/settings/mail/test', [SettingController::class, 'sendTestMail'])->middleware('throttle:5,1')->name('settings.mail.test');
     Route::view('/reports', 'admin.reports')->name('reports');
     Route::get('/customers', CustomerController::class)->name('customers');
     Route::get('/contacts', [ContactMessageController::class, 'index'])->name('contacts.index');

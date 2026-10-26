@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\UserRole;
 use App\Http\Requests\StoreContactMessageRequest;
 use App\Models\ContactMessage;
+use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\ContactMessageReceived;
 use Illuminate\Http\RedirectResponse;
@@ -36,6 +37,12 @@ class ContactController extends Controller
                 User::query()->where('role', UserRole::Admin)->get(),
                 new ContactMessageReceived($contactMessage),
             );
+
+            $extraRecipient = Setting::get('mail.contact_recipient');
+
+            if (filled($extraRecipient)) {
+                Notification::route('mail', $extraRecipient)->notify(new ContactMessageReceived($contactMessage));
+            }
         } catch (Throwable $exception) {
             report($exception);
         }
