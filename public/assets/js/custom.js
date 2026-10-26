@@ -168,6 +168,23 @@ $(function () {
         update();
     });
 
+    /* Fields that must not contain links (pattern shared with the server-side NoUrls rule) */
+    $('[data-no-urls]').each(function () {
+        var $field = $(this);
+        var pattern = new RegExp($field.data('no-urls'), 'i');
+        var message = $field.data('no-urls-message');
+        var $error = $('#' + $field.attr('aria-describedby'));
+
+        function check() {
+            var hasUrl = pattern.test($field.val());
+            this.setCustomValidity(hasUrl ? message : '');
+            $field.toggleClass('has-error', hasUrl);
+            $error.text(hasUrl ? message : '').prop('hidden', !hasUrl);
+        }
+
+        $field.on('input blur', check);
+    });
+
     /* Password visibility */
     $('.toggle-pass').on('click', function () {
         var $input = $(this).siblings('input');
