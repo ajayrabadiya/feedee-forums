@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Enums\MediaType;
+use App\Enums\PostStatus;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Models\Post;
 use App\Models\PostMedia;
+use App\Models\Setting;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,9 +36,16 @@ class PostController extends Controller
         $search = is_string($request->query('q')) ? Str::limit(trim($request->query('q')), 100, '') : '';
         $topic = in_array($request->query('topic'), Post::TOPICS, true) ? $request->query('topic') : null;
 
+        $showFeatured = $search === '' && $topic === null;
+
+        $featuredPosts = $showFeatured && (int) $request->query('page', 1) <= 1
+            ? Post::query()->published()->where('is_featured', true)->with(['user', 'media'])->latest('featured_at')->get()
+            : collect();
+
         $posts = Post::query()
-            ->live()
+            ->published()
             ->with(['user', 'media'])
+            ->when($showFeatured, fn ($query) => $query->where('is_featured', false))
             ->when($topic, fn ($query) => $query->where('topic', $topic))
             ->when($search !== '', function ($query) use ($search): void {
                 $like = '%'.addcslashes($search, '%_\\').'%';
@@ -50,6 +59,7 @@ class PostController extends Controller
 
         return view('pages.home', [
             'posts' => $posts,
+            'featuredPosts' => $featuredPosts,
             'search' => $search,
             'topic' => $topic,
             'topicStyles' => Post::TOPIC_STYLES,
@@ -72,7 +82,11 @@ class PostController extends Controller
 
         try {
             $post = DB::transaction(function () use ($request, $disk, &$storedPaths): Post {
-                $post = $request->user()->posts()->create($request->safe()->only(['title', 'topic', 'body']));
+                $post = $request->user()->posts()->make($request->safe()->only(['title', 'topic', 'body']));
+                $post->status = Setting::requiresPostApproval() && ! $request->user()->isAdmin()
+                    ? PostStatus::Pending
+                    : PostStatus::Approved;
+                $post->save();
 
                 $this->attachUploads($request, $post, $disk, $storedPaths);
 
@@ -92,7 +106,9 @@ class PostController extends Controller
 
         return redirect()
             ->route('posts.show', $post)
-            ->with('status', 'Thanks for sharing! Your post has been published.');
+            ->with('status', $post->isPending()
+                ? 'Thanks for sharing! Your post will appear in the feed once a moderator approves it.'
+                : 'Thanks for sharing! Your post has been published.');
     }
 
     public function show(Request $request, string $post): View
@@ -105,6 +121,8 @@ class PostController extends Controller
         if ($realPost === null) {
             return view('pages.post');
         }
+
+        abort_unless(Gate::forUser($request->user())->allows('view', $realPost), 404);
 
         return view('pages.post-show', [
             'post' => $realPost,
@@ -137,6 +155,10 @@ class PostController extends Controller
         try {
             $removedMedia = DB::transaction(function () use ($request, $post, $disk, &$storedPaths): Collection {
                 $post->update($request->safe()->only(['title', 'topic', 'body']));
+
+                if ($post->isRejected() && $post->user_id === $request->user()->id) {
+                    $post->resubmit();
+                }
 
                 $removedMedia = $post->media()->whereKey($request->removedMediaIds())->get();
 

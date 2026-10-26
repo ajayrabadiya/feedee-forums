@@ -54,6 +54,13 @@
                             <div class="my-post-info">
                                 <h3><a href="{{ route('posts.show', $post) }}">{{ $post->title }}</a></h3>
                                 <p class="my-post-meta">
+                                    @if ($post->isPending())
+                                        <span class="post-status pending"><i class="bi bi-hourglass-split"></i>Waiting for review</span>
+                                    @elseif ($post->isRejected())
+                                        <span class="post-status rejected" title="{{ $post->rejection_note }}"><i class="bi bi-x-circle"></i>Not approved: {{ $post->rejection_reason }}</span>
+                                    @elseif ($post->is_featured)
+                                        <span class="post-status featured"><i class="bi bi-star-fill"></i>Featured</span>
+                                    @endif
                                     <span class="topic">{{ $post->topic }}</span>
                                     <span><i class="bi bi-clock"></i>Posted {{ $post->created_at->diffForHumans() }}</span>
                                     @if ($postImages->isNotEmpty())

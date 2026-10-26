@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Enums\PostStatus;
+use App\Models\Post;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        View::composer('admin.partials.sidebar', function ($view): void {
+            $view->with('pendingPostsCount', Post::query()->where('status', PostStatus::Pending)->count());
+        });
     }
 }

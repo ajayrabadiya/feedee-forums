@@ -16,7 +16,10 @@
     }
 @endphp
 
-<article class="post-card">
+<article @class(['post-card', 'is-featured' => $featured ?? false])>
+    @if ($featured ?? false)
+        <span class="featured-tag"><i class="bi bi-pin-angle-fill"></i>Featured by moderators</span>
+    @endif
     <header class="post-head">
         <span class="avatar avatar-icon" aria-hidden="true"><i class="bi bi-person-fill"></i></span>
         <div class="post-by">

@@ -2677,6 +2677,34 @@ textarea.form-control {
     color: var(--primary);
 }
 
+.post-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.my-post-meta .post-status i {
+    margin-right: 5px;
+}
+
+.post-status.pending {
+    background: #fdf4e2;
+    color: #a86b00;
+}
+
+.post-status.rejected {
+    background: #fdeeee;
+    color: var(--danger);
+}
+
+.post-status.featured {
+    background: #fff6dc;
+    color: #c98500;
+}
+
 .my-post-actions {
     display: flex;
     flex-shrink: 0;

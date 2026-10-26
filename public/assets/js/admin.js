@@ -162,6 +162,50 @@ $(function () {
         tableFor($rows).rows($rows).invalidate('dom').draw(false);
     }
 
+    /* Server-backed moderation (tables with data-moderate-url); other tables stay as design previews */
+    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+    function sendJson(url, method, payload) {
+        return $.ajax({
+            url: url,
+            method: method,
+            contentType: 'application/json',
+            dataType: 'json',
+            headers: { 'X-CSRF-TOKEN': csrfToken, Accept: 'application/json' },
+            data: JSON.stringify(payload)
+        }).fail(function (xhr) {
+            var res = xhr.responseJSON || {};
+            var firstError = res.errors ? Object.values(res.errors)[0][0] : null;
+            toast(firstError || res.message || 'Something went wrong. Please try again.', true);
+        });
+    }
+
+    function moderate($rows, action, extra) {
+        var url = $rows.closest('table').data('moderate-url');
+
+        if (!url) {
+            return $.Deferred().resolve({}).promise();
+        }
+
+        var ids = $rows.map(function () { return $(this).data('id'); }).get();
+
+        return sendJson(url, 'POST', $.extend({ action: action, ids: ids }, extra || {}))
+            .done(function (res) {
+                if (res.counts) {
+                    var $badge = $('[data-pending-count]');
+                    $badge.text(res.counts.pending).prop('hidden', res.counts.pending === 0);
+                }
+            });
+    }
+
+    function applyServerState($rows, posts) {
+        posts.forEach(function (post) {
+            var $row = $rows.filter('[data-id="' + post.id + '"]');
+            setStatus($row, post.status);
+            setFeatured($row, post.featured);
+        });
+    }
+
     function removeRows($rows) {
         var dt = tableFor($rows);
         $rows.fadeOut(250).promise().done(function () {
@@ -183,35 +227,68 @@ $(function () {
         bootstrap.Modal.getOrCreateInstance(el).show();
     }
 
+    $(rejectModal).on('show.bs.modal', function () {
+        $('#rejectNote').val('');
+        $('#rejectConfirm').prop('disabled', false);
+    });
+
     $('#rejectConfirm').on('click', function () {
         var reason = $('#rejectReason').val();
-        var n = $target.length;
+        var note = String($('#rejectNote').val() || '').trim();
+        var $rows = $target;
+        var n = $rows.length;
+        var $btn = $(this).prop('disabled', true);
 
-        bootstrap.Modal.getInstance(rejectModal).hide();
-        setStatus($target, 'rejected');
-        toast((n > 1 ? n + ' posts' : 'Post') + ' rejected. Author notified: ' + reason + '.');
+        moderate($rows, 'reject', { reason: reason, note: note || null }).done(function (res) {
+            bootstrap.Modal.getInstance(rejectModal).hide();
+            if (res.posts) {
+                applyServerState($rows, res.posts);
+            } else {
+                setStatus($rows, 'rejected');
+                setFeatured($rows, false);
+            }
+            toast(res.message || (n > 1 ? n + ' posts' : 'Post') + ' rejected. Author notified: ' + reason + '.');
+        }).always(function () {
+            $btn.prop('disabled', false);
+        });
     });
 
     $('#deleteConfirm').on('click', function () {
-        var n = $target.length;
+        var $rows = $target;
+        var n = $rows.length;
         var mode = $(deleteModal).data('mode');
 
-        bootstrap.Modal.getInstance(deleteModal).hide();
-
         if (mode === 'report') {
-            $target.find('.act.remove, .act.dismiss').prop('disabled', true);
-            setStatus($target, 'resolved', 'Post removed');
+            bootstrap.Modal.getInstance(deleteModal).hide();
+            $rows.find('.act.remove, .act.dismiss').prop('disabled', true);
+            setStatus($rows, 'resolved', 'Post removed');
             toast('Post and media permanently deleted. Report resolved.');
-        } else {
-            removeRows($target);
-            toast((n > 1 ? n + ' posts' : 'Post') + ' and all media permanently deleted.');
+            return;
         }
+
+        var $btn = $(this).prop('disabled', true);
+
+        moderate($rows, 'delete').done(function (res) {
+            bootstrap.Modal.getInstance(deleteModal).hide();
+            removeRows($rows);
+            toast(res.message || (n > 1 ? n + ' posts' : 'Post') + ' and all media permanently deleted.');
+        }).always(function () {
+            $btn.prop('disabled', false);
+        });
     });
 
     /* Row actions: posts */
     $(document).on('click', '.act.approve', function () {
-        setStatus($(this).closest('tr'), 'approved');
-        toast('Post approved and published to the feed.');
+        var $row = $(this).closest('tr');
+
+        moderate($row, 'approve').done(function (res) {
+            if (res.posts) {
+                applyServerState($row, res.posts);
+            } else {
+                setStatus($row, 'approved');
+            }
+            toast(res.message || 'Post approved and published to the feed.');
+        });
     });
 
     $(document).on('click', '.act.reject', function () {
@@ -222,11 +299,17 @@ $(function () {
         var $row = $(this).closest('tr');
         var on = $row.attr('data-featured') !== '1';
 
-        if (on && $row.attr('data-status') !== 'approved') {
-            setStatus($row, 'approved');
-        }
-        setFeatured($row, on);
-        toast(on ? 'Post featured at the top of the feed.' : 'Post removed from featured.');
+        moderate($row, on ? 'feature' : 'unfeature').done(function (res) {
+            if (res.posts) {
+                applyServerState($row, res.posts);
+            } else {
+                if (on && $row.attr('data-status') !== 'approved') {
+                    setStatus($row, 'approved');
+                }
+                setFeatured($row, on);
+            }
+            toast(res.message || (on ? 'Post featured at the top of the feed.' : 'Post removed from featured.'));
+        });
     });
 
     $(document).on('click', '.act.delete', function () {
@@ -256,12 +339,24 @@ $(function () {
         if (!n) return;
 
         if (action === 'approve') {
-            setStatus($rows, 'approved');
-            toast(n + ' posts approved.');
+            moderate($rows, 'approve').done(function (res) {
+                if (res.posts) {
+                    applyServerState($rows, res.posts);
+                } else {
+                    setStatus($rows, 'approved');
+                }
+                toast(res.message || n + ' posts approved.');
+            });
         } else if (action === 'feature') {
-            setStatus($rows, 'approved');
-            setFeatured($rows, true);
-            toast(n + ' posts featured.');
+            moderate($rows, 'feature').done(function (res) {
+                if (res.posts) {
+                    applyServerState($rows, res.posts);
+                } else {
+                    setStatus($rows, 'approved');
+                    setFeatured($rows, true);
+                }
+                toast(res.message || n + ' posts featured.');
+            });
         } else if (action === 'reject') {
             openModal(rejectModal, $rows);
         } else if (action === 'delete') {
@@ -281,9 +376,27 @@ $(function () {
     };
 
     $('[data-approval-switch]').on('change', function () {
-        var on = this.checked;
-        $(this).closest('.setting-card').find('.setting-hint').text(on ? APPROVAL_HINTS.on : APPROVAL_HINTS.off);
-        toast(on ? 'Approval turned on. New posts will wait for review.' : 'Approval turned off. New posts go live instantly.');
+        var input = this;
+        var on = input.checked;
+        var url = $(input).data('url');
+        var $hint = $(input).closest('.setting-card').find('.setting-hint');
+
+        if (!url) {
+            $hint.text(on ? APPROVAL_HINTS.on : APPROVAL_HINTS.off);
+            toast(on ? 'Approval turned on. New posts will wait for review.' : 'Approval turned off. New posts go live instantly.');
+            return;
+        }
+
+        input.disabled = true;
+
+        sendJson(url, 'PUT', { enabled: on }).done(function (res) {
+            $hint.text(res.enabled ? APPROVAL_HINTS.on : APPROVAL_HINTS.off);
+            toast(res.message);
+        }).fail(function () {
+            input.checked = !on;
+        }).always(function () {
+            input.disabled = false;
+        });
     });
 
     /* Manual cleanup trigger */

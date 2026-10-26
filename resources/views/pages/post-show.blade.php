@@ -44,6 +44,27 @@
                         </div>
                     </header>
 
+                    @if ($post->isPending())
+                        <div class="callout mb-4" role="status">
+                            <i class="bi bi-hourglass-split"></i>
+                            <div>
+                                <strong>Waiting for review</strong>
+                                <p>Only the author and moderators can see this post until it's approved.</p>
+                            </div>
+                        </div>
+                    @elseif ($post->isRejected())
+                        <div class="callout error mb-4" role="status">
+                            <i class="bi bi-x-circle"></i>
+                            <div>
+                                <strong>Not approved: {{ $post->rejection_reason }}</strong>
+                                @if (filled($post->rejection_note))
+                                    <p>{{ $post->rejection_note }}</p>
+                                @endif
+                                <p>Only the author and moderators can see this post. Edit it to fix the problem and it will be sent back for review.</p>
+                            </div>
+                        </div>
+                    @endif
+
                     <h1>{{ $post->title }}</h1>
 
                     <div class="post-chips">

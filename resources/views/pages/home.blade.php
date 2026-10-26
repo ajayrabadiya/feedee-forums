@@ -100,6 +100,14 @@
                 </form>
 
                 <div class="feed" id="feed">
+                    @if ($featuredPosts->isNotEmpty())
+                        <div class="day-divider"><span><i class="bi bi-star-fill text-warning me-1"></i>Featured</span></div>
+
+                        @foreach ($featuredPosts as $post)
+                            @include('partials.post-card', ['post' => $post, 'featured' => true])
+                        @endforeach
+                    @endif
+
                     @forelse ($posts->groupBy(fn ($post) => $post->created_at->toDateString()) as $dayPosts)
                         <div class="day-divider"><span>{{ $dayLabel($dayPosts->first()->created_at) }}</span></div>
 
@@ -107,6 +115,7 @@
                             @include('partials.post-card', ['post' => $post])
                         @endforeach
                     @empty
+                        @if ($featuredPosts->isEmpty())
                         <div class="feed-empty">
                             <span class="feed-empty-icon"><i class="bi {{ $filtered ? 'bi-search' : 'bi-images' }}"></i></span>
                             @if ($filtered)
@@ -119,6 +128,7 @@
                                 <a href="{{ route('posts.create') }}" class="btn-fill"><i class="bi bi-plus-lg"></i>Create the first post</a>
                             @endif
                         </div>
+                        @endif
                     @endforelse
                 </div>
 

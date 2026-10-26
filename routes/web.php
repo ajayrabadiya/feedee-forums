@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\PostModerationController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
@@ -41,7 +43,9 @@ Route::middleware('auth')->group(function () {
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::view('/', 'admin.dashboard')->name('dashboard');
-    Route::view('/posts', 'admin.posts')->name('posts');
+    Route::get('/posts', [PostModerationController::class, 'index'])->name('posts');
+    Route::post('/posts/moderate', [PostModerationController::class, 'moderate'])->middleware('throttle:60,1')->name('posts.moderate');
+    Route::put('/settings/post-approval', [SettingController::class, 'updatePostApproval'])->name('settings.post-approval');
     Route::view('/reports', 'admin.reports')->name('reports');
     Route::view('/docs', 'admin.docs')->name('docs');
 });

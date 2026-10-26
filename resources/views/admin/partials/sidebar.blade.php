@@ -8,7 +8,7 @@
 
             <div class="side-label">Moderation</div>
             <ul class="side-nav">
-                <li><a href="{{ route('admin.posts') }}"@if (request()->routeIs('admin.posts')) class="active" aria-current="page"@endif><i class="bi bi-file-earmark-richtext"></i>Posts<span class="count">5</span></a></li>
+                <li><a href="{{ route('admin.posts') }}"@if (request()->routeIs('admin.posts')) class="active" aria-current="page"@endif><i class="bi bi-file-earmark-richtext"></i>Posts<span class="count" data-pending-count title="Posts waiting for review" @if (! $pendingPostsCount) hidden @endif>{{ $pendingPostsCount }}</span></a></li>
                 <li><a href="{{ route('admin.reports') }}"@if (request()->routeIs('admin.reports')) class="active" aria-current="page"@endif><i class="bi bi-flag"></i>Reports<span class="count hot">5</span></a></li>
             </ul>
 
