@@ -39,7 +39,7 @@
 
                 <div class="row g-4 mb-4">
                     <!-- Chart -->
-                    <div class="col-xl-7">
+                    <div class="col-12">
                         <section class="panel h-100">
                             <div class="panel-head">
                                 <div>
@@ -57,63 +57,6 @@
                                     <div class="bar"><div class="bar-track"><span class="bar-fill" style="height: 75%;" data-value="45"></span><span class="bar-fill alt" style="height: 66%;"></span></div><small>Wed</small></div>
                                     <div class="bar"><div class="bar-track"><span class="bar-fill" style="height: 90%;" data-value="54"></span><span class="bar-fill alt" style="height: 79%;"></span></div><small>Thu</small></div>
                                     <div class="bar"><div class="bar-track"><span class="bar-fill" style="height: 62%;" data-value="37"></span><span class="bar-fill alt" style="height: 38%;"></span></div><small>Fri</small></div>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-
-                    <!-- Scheduler -->
-                    <div class="col-xl-5">
-                        <section class="panel h-100">
-                            <div class="panel-head">
-                                <div>
-                                    <h2>Scheduler &amp; cleanup</h2>
-                                    <p>Laravel Scheduler via cron, every minute</p>
-                                </div>
-                                <button type="button" class="btn-soft sm" data-run-cleanup><i class="bi bi-play-fill"></i>Run now</button>
-                            </div>
-                            <div class="panel-body">
-                                <div class="job">
-                                    <span class="stat-icon ic-red"><i class="bi bi-trash3"></i></span>
-                                    <div>
-                                        <code>posts:purge-expired</code>
-                                        <p>Daily 03:00 &middot; <span class="last-run">Today 03:00</span> &middot; 42 posts, 118 files</p>
-                                    </div>
-                                    <span class="status st-ok">OK</span>
-                                </div>
-                                <div class="job">
-                                    <span class="stat-icon ic-purple"><i class="bi bi-images"></i></span>
-                                    <div>
-                                        <code>media:clean-orphans</code>
-                                        <p>Daily 03:30 &middot; Freed 1.2 GB</p>
-                                    </div>
-                                    <span class="status st-ok">OK</span>
-                                </div>
-                                <div class="job">
-                                    <span class="stat-icon ic-blue"><i class="bi bi-diagram-3"></i></span>
-                                    <div>
-                                        <code>sitemap:generate</code>
-                                        <p>Hourly &middot; 18 minutes ago</p>
-                                    </div>
-                                    <span class="status st-ok">OK</span>
-                                </div>
-                                <div class="job">
-                                    <span class="stat-icon ic-green"><i class="bi bi-aspect-ratio"></i></span>
-                                    <div>
-                                        <code>thumbnails queue</code>
-                                        <p>Every minute &middot; 0 jobs waiting</p>
-                                    </div>
-                                    <span class="status st-ok">OK</span>
-                                </div>
-
-                                <div class="mt-3">
-                                    <div class="d-flex justify-content-between small"><span class="text-muted">Media storage</span><strong>16.9 GB of 50 GB</strong></div>
-                                    <div class="storage-bar" role="img" aria-label="Storage: 9.8 GB videos, 6.2 GB images, 0.9 GB thumbnails">
-                                        <span style="width: 19.6%; background: var(--primary);"></span>
-                                        <span style="width: 12.4%; background: #ff8a50;"></span>
-                                        <span style="width: 1.8%; background: #ffd2c2;"></span>
-                                    </div>
-                                    <div class="legend"><span><i></i>Videos</span><span><i style="background: #ff8a50;"></i>Images</span><span><i class="alt"></i>Thumbnails</span></div>
                                 </div>
                             </div>
                         </section>

@@ -66,7 +66,9 @@ class AdminPagesTest extends TestCase
             ->assertDontSee('bi-bell', false)
             ->assertDontSee('open reports')
             ->assertDontSee('Search posts, users or IDs')
-            ->assertDontSee('Admin guide');
+            ->assertDontSee('Admin guide')
+            ->assertDontSee('Scheduler &amp; cleanup', false)
+            ->assertDontSee('data-run-cleanup', false);
     }
 
     public function test_topbar_shows_the_signed_in_administrator(): void
