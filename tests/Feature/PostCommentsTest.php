@@ -139,7 +139,9 @@ class PostCommentsTest extends TestCase
         $post = Post::factory()->create();
         Comment::factory()->for($post)->for($post->user)->create();
 
-        $this->get(route('posts.show', $post))->assertSee('<span class="comment-badge">Author</span>', false);
+        $this->get(route('posts.show', $post))
+            ->assertSee('<li class="comment is-author" id="comment-', false)
+            ->assertSee('<span class="comment-badge"><i class="bi bi-patch-check-fill" aria-hidden="true"></i>Author</span>', false);
     }
 
     public function test_comment_content_is_escaped(): void

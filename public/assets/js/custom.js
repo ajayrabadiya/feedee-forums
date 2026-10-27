@@ -295,9 +295,19 @@ $(function () {
         $box.addClass('has-missing-media');
     }
 
+    /* The gallery reuses one <img> for every photo, so a fallback must clear once a working photo loads */
+    function clearMediaFallback(el) {
+        var $el = $(el);
+        if (!$el.data('fallback-shown')) return;
+        $el.data('fallback-shown', false).removeClass('is-missing');
+        $el.next('.media-missing').remove();
+        $el.closest('.gallery-main, .gallery-thumbs button, .my-post-thumb').removeClass('has-missing-media');
+    }
+
     $('img[data-media-fallback]').each(function () {
         if (this.complete && this.naturalWidth === 0) showMediaFallback(this);
-    }).on('error', function () { showMediaFallback(this); });
+    }).on('error', function () { showMediaFallback(this); })
+        .on('load', function () { clearMediaFallback(this); });
 
     $('video[data-media-fallback]').each(function () {
         var video = this;

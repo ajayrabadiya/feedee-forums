@@ -6,6 +6,7 @@ use App\Enums\PostStatus;
 use App\Models\ContactMessage;
 use App\Models\Post;
 use App\Models\Setting;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Throwable;
@@ -25,6 +26,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        URL::macro('versionedAsset', function (string $path): string {
+            $file = public_path($path);
+
+            return asset($path).(is_file($file) ? '?v='.filemtime($file) : '');
+        });
+
         Setting::applyMailConfig();
 
         View::composer('partials.support-fab', function ($view): void {

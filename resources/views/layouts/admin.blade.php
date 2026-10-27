@@ -3,8 +3,8 @@
 <head>
 @include('partials.head')
     <meta name="robots" content="noindex, nofollow">
-    <link rel="stylesheet" href="{{ asset('assets/css/dataTables.bootstrap5.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/admin.css') }}">
+    <link rel="stylesheet" href="{{ url()->versionedAsset('assets/css/dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="{{ url()->versionedAsset('assets/css/admin.css') }}">
 </head>
 <body class="admin-body">
 
@@ -24,8 +24,8 @@
     @stack('modals')
 
 @include('partials.scripts')
-    <script src="{{ asset('assets/js/dataTables.min.js') }}"></script>
-    <script src="{{ asset('assets/js/dataTables.bootstrap5.min.js') }}"></script>
-    <script src="{{ asset('assets/js/admin.js') }}"></script>
+    <script src="{{ url()->versionedAsset('assets/js/dataTables.min.js') }}"></script>
+    <script src="{{ url()->versionedAsset('assets/js/dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ url()->versionedAsset('assets/js/admin.js') }}"></script>
 </body>
 </html>

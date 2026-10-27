@@ -37,6 +37,20 @@ class FrontendPagesTest extends TestCase
         $response->assertDontSee('.html"', false);
     }
 
+    public function test_local_css_and_js_urls_include_file_version(): void
+    {
+        $response = $this->get('/');
+
+        foreach (['assets/css/bootstrap.min.css', 'assets/css/style.css', 'assets/js/jquery.min.js', 'assets/js/custom.js'] as $path) {
+            $response->assertSee(asset($path).'?v='.filemtime(public_path($path)), false);
+        }
+    }
+
+    public function test_versioned_asset_skips_version_for_missing_file(): void
+    {
+        $this->assertSame(asset('assets/css/missing.css'), url()->versionedAsset('assets/css/missing.css'));
+    }
+
     public function test_unknown_page_renders_custom_not_found_page(): void
     {
         $response = $this->get('/this-page-does-not-exist');
