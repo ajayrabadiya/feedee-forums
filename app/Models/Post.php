@@ -140,6 +140,26 @@ class Post extends Model
     }
 
     /**
+     * @return HasMany<PostLike, $this>
+     */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(PostLike::class);
+    }
+
+    /**
+     * Add like counts, and whether the given user liked each post, to a query.
+     *
+     * @param  Builder<Post>  $query
+     */
+    public function scopeWithLikeInfo(Builder $query, ?User $user): void
+    {
+        $query->withCount('likes')->withExists([
+            'likes as liked_by_viewer' => fn (Builder $likes) => $likes->where('user_id', $user?->id ?? 0),
+        ]);
+    }
+
+    /**
      * @return HasMany<Comment, $this>
      */
     public function comments(): HasMany

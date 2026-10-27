@@ -168,6 +168,42 @@ $(function () {
         update();
     });
 
+    /* Like / unlike posts without reloading the page */
+    $(document).on('submit', '.like-form', function (e) {
+        e.preventDefault();
+
+        var form = this;
+        var $btn = $(form).find('.like-btn');
+
+        if ($btn.prop('disabled')) return;
+        $btn.prop('disabled', true);
+
+        $.ajax({
+            url: form.action,
+            method: 'POST',
+            dataType: 'json',
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'), Accept: 'application/json' }
+        }).done(function (res) {
+            $('.like-form').filter(function () { return this.action === form.action; }).find('.like-btn').each(function () {
+                var verb = res.liked ? 'Unlike' : 'Like';
+                var label = res.count === 0 ? 'No likes yet' : (res.count === 1 ? '1 like' : res.count + ' likes');
+
+                $(this).toggleClass('is-liked', res.liked)
+                    .attr({ 'aria-pressed': res.liked, 'aria-label': verb + ' this post (' + label + ')', title: verb })
+                    .find('i').attr('class', res.liked ? 'bi bi-heart-fill' : 'bi bi-heart');
+                $(this).find('.like-count').text(res.count);
+            });
+        }).fail(function (xhr) {
+            if (xhr.status === 401 || xhr.status === 419) {
+                window.location.reload();
+                return;
+            }
+            toast((xhr.responseJSON && xhr.responseJSON.message) || 'Could not update your like. Please try again.', true);
+        }).always(function () {
+            $btn.prop('disabled', false);
+        });
+    });
+
     /* Fields that must not contain links (pattern shared with the server-side NoUrls rule) */
     $('[data-no-urls]').each(function () {
         var $field = $(this);

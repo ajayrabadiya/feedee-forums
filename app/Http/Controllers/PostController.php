@@ -39,13 +39,14 @@ class PostController extends Controller
         $showFeatured = $search === '' && $topic === null;
 
         $featuredPosts = $showFeatured && (int) $request->query('page', 1) <= 1
-            ? Post::query()->published()->where('is_featured', true)->with(['user', 'media'])->withCount('comments')->latest('featured_at')->get()
+            ? Post::query()->published()->where('is_featured', true)->with(['user', 'media'])->withCount('comments')->withLikeInfo($request->user())->latest('featured_at')->get()
             : collect();
 
         $posts = Post::query()
             ->published()
             ->with(['user', 'media'])
             ->withCount('comments')
+            ->withLikeInfo($request->user())
             ->when($showFeatured, fn ($query) => $query->where('is_featured', false))
             ->when($topic, fn ($query) => $query->where('topic', $topic))
             ->when($search !== '', function ($query) use ($search): void {
@@ -118,6 +119,7 @@ class PostController extends Controller
         $realPost = Post::query()
             ->where('public_id', $post)
             ->with(['user', 'media', 'comments' => fn ($query) => $query->with('user')->oldest()->oldest('id')])
+            ->withLikeInfo($request->user())
             ->first();
 
         if ($realPost === null) {

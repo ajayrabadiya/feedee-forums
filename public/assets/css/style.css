@@ -2965,6 +2965,82 @@ textarea.form-control {
     overflow-wrap: anywhere;
 }
 
+/* Likes */
+.like-form {
+    display: inline-flex;
+    margin: 0;
+}
+
+.like-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: 42px;
+    padding: 0 16px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--card);
+    color: var(--text);
+    font-weight: 600;
+    font-size: 14px;
+    transition: background-color .2s, border-color .2s, color .2s, transform .15s;
+}
+
+.like-btn i {
+    font-size: 16px;
+    transition: transform .2s;
+}
+
+.like-btn:hover {
+    border-color: #f3a8b4;
+    color: #e0245e;
+}
+
+.like-btn:active i {
+    transform: scale(.85);
+}
+
+.like-btn.is-liked {
+    border-color: #f7c1cc;
+    background: #fdecef;
+    color: #e0245e;
+}
+
+.like-btn.is-liked i {
+    animation: like-pop .3s ease;
+}
+
+.like-btn:disabled {
+    opacity: .7;
+}
+
+.like-btn.sm {
+    height: auto;
+    padding: 3px 10px;
+    border-color: transparent;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.like-btn.sm.is-liked {
+    background: #fdecef;
+    color: #e0245e;
+}
+
+@keyframes like-pop {
+    50% {
+        transform: scale(1.3);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .like-btn.is-liked i {
+        animation: none;
+    }
+}
+
 .foot-comments {
     display: inline-flex;
     align-items: center;

@@ -122,6 +122,9 @@
                     @endforeach
 
                     <div class="post-actions">
+                        @if ($post->isApproved())
+                            @include('partials.like-button', ['post' => $post])
+                        @endif
                         <button type="button" class="btn-soft" data-copy="{{ route('posts.show', $post) }}" data-copy-msg="Post link copied"><i class="bi bi-link-45deg"></i>Copy link</button>
                         @can('update', $post)
                             <a href="{{ route('posts.edit', $post) }}" class="btn-soft"><i class="bi bi-pencil-square"></i>Edit post</a>

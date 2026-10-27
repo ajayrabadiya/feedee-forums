@@ -11,6 +11,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\StoreIntendedUrl;
 use Illuminate\Support\Facades\Route;
@@ -47,6 +48,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/p/{post:public_id}', [PostController::class, 'destroy'])->name('posts.destroy');
 
     Route::post('/p/{post:public_id}/comments', [CommentController::class, 'store'])->middleware('throttle:10,1')->name('posts.comments.store');
+    Route::post('/p/{post:public_id}/like', PostLikeController::class)->middleware('throttle:60,1')->name('posts.like');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 });
 

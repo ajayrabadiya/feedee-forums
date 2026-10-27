@@ -75,6 +75,7 @@
         @if ($videos->isNotEmpty())
             <span class="foot-media"><i class="bi bi-camera-video"></i>{{ trans_choice('{1} :count video|[2,*] :count videos', $videos->count()) }}</span>
         @endif
+        @include('partials.like-button', ['post' => $post, 'size' => 'sm'])
         <a href="{{ $postUrl }}#comments" class="foot-comments"><i class="bi bi-chat"></i>{{ trans_choice('{0} No comments|{1} 1 comment|[2,*] :count comments', $post->comments_count ?? 0) }}</a>
         <span><i class="bi bi-hourglass-split"></i>{{ trans_choice('{0} Expires today|{1} 1 day left|[2,*] :count days left', $daysLeft) }}</span>
         <a href="{{ $postUrl }}" class="read-more">View post <i class="bi bi-arrow-right"></i></a>
