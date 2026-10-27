@@ -75,6 +75,9 @@
                         @if ($videos->isNotEmpty())
                             <span class="chip"><i class="bi bi-camera-video"></i>{{ trans_choice('{1} :count video|[2,*] :count videos', $videos->count()) }}</span>
                         @endif
+                        @if ($post->isApproved())
+                            <a href="#comments" class="chip"><i class="bi bi-chat"></i>{{ trans_choice('{0} No comments yet|{1} 1 comment|[2,*] :count comments', $post->comments->count()) }}</a>
+                        @endif
                     </div>
 
                     @if (filled($post->body))
@@ -86,7 +89,9 @@
                     @endif
 
                     @if ($images->isNotEmpty())
-                        @php($firstImage = $images->first())
+                        @php
+                            $firstImage = $images->first();
+                        @endphp
                         <div class="gallery">
                             <div class="gallery-main">
                                 <img src="{{ $firstImage->url() }}" alt="{{ $firstImage->alt_text ?: 'Photo 1 from '.$post->title }}" fetchpriority="high" data-media-fallback>
@@ -132,6 +137,66 @@
                         @endcan
                     </div>
                 </article>
+
+                @if ($post->isApproved())
+                    <section class="post-card comments" id="comments" aria-labelledby="commentsTitle">
+                        <h2 class="comments-title" id="commentsTitle">
+                            Comments <span class="comments-count">{{ $post->comments->count() }}</span>
+                        </h2>
+
+                        @auth
+                            <form method="post" action="{{ route('posts.comments.store', $post) }}" class="comment-form">
+                                @csrf
+                                <span class="avatar avatar-icon" aria-hidden="true"><i class="bi bi-person-fill"></i></span>
+                                <div class="comment-form-body">
+                                    <label for="commentBody" class="visually-hidden">Write a comment</label>
+                                    <textarea @class(['form-control', 'has-error' => $errors->has('body')]) id="commentBody" name="body" rows="3" maxlength="{{ \App\Models\Comment::MAX_LENGTH }}" required placeholder="Write a friendly comment…" data-counter="#commentCount">{{ old('body') }}</textarea>
+                                    @error('body')
+                                        <p class="form-error" role="alert">{{ $message }}</p>
+                                    @enderror
+                                    <div class="comment-form-actions">
+                                        <span class="char-count" id="commentCount">0 / {{ \App\Models\Comment::MAX_LENGTH }}</span>
+                                        <button type="submit" class="btn-fill sm"><i class="bi bi-send"></i>Post comment</button>
+                                    </div>
+                                </div>
+                            </form>
+                        @else
+                            <div class="comment-login">
+                                <i class="bi bi-chat-heart"></i>
+                                <p><a href="{{ route('login', ['redirect' => route('posts.show', $post, false).'#comments']) }}">Log in</a> or <a href="{{ route('register', ['redirect' => route('posts.show', $post, false).'#comments']) }}">sign up</a> to join the conversation.</p>
+                            </div>
+                        @endauth
+
+                        @if ($post->comments->isEmpty())
+                            <p class="comments-empty">No comments yet. Be the first to say something nice!</p>
+                        @else
+                            <ol class="comment-list">
+                                @foreach ($post->comments as $comment)
+                                    <li class="comment" id="comment-{{ $comment->id }}">
+                                        <span class="avatar avatar-icon" aria-hidden="true"><i class="bi bi-person-fill"></i></span>
+                                        <div class="comment-main">
+                                            <div class="comment-head">
+                                                <strong>{{ $comment->user->name }}</strong>
+                                                @if ($comment->user_id === $post->user_id)
+                                                    <span class="comment-badge">Author</span>
+                                                @endif
+                                                <time datetime="{{ $comment->created_at->toIso8601String() }}" title="{{ $comment->created_at->format('M j, Y g:i A') }}">{{ $comment->created_at->diffForHumans() }}</time>
+                                                @can('delete', $comment)
+                                                    <form method="post" action="{{ route('comments.destroy', $comment) }}" class="comment-delete" data-confirm="Delete this comment?">
+                                                        @csrf
+                                                        @method('delete')
+                                                        <button type="submit" class="icon-btn" title="Delete comment" aria-label="Delete comment by {{ $comment->user->name }}"><i class="bi bi-trash3"></i></button>
+                                                    </form>
+                                                @endcan
+                                            </div>
+                                            <p class="comment-body">{!! nl2br(e($comment->body)) !!}</p>
+                                        </div>
+                                    </li>
+                                @endforeach
+                            </ol>
+                        @endif
+                    </section>
+                @endif
             </div>
 
             <aside class="col-lg-4">
