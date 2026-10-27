@@ -45,6 +45,14 @@ class PostPolicy
     }
 
     /**
+     * Members can like approved posts.
+     */
+    public function like(User $user, Post $post): bool
+    {
+        return $post->isApproved();
+    }
+
+    /**
      * Only administrators may approve, reject or feature posts.
      */
     public function moderate(User $user): bool

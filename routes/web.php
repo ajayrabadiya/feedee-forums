@@ -7,9 +7,11 @@ use App\Http\Controllers\Admin\PostModerationController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\StoreIntendedUrl;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +46,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/p/{post:public_id}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::put('/p/{post:public_id}', [PostController::class, 'update'])->middleware('throttle:10,1')->name('posts.update');
     Route::delete('/p/{post:public_id}', [PostController::class, 'destroy'])->name('posts.destroy');
+
+    Route::post('/p/{post:public_id}/comments', [CommentController::class, 'store'])->middleware('throttle:10,1')->name('posts.comments.store');
+    Route::post('/p/{post:public_id}/like', PostLikeController::class)->middleware('throttle:60,1')->name('posts.like');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
