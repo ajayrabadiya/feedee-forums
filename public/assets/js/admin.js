@@ -418,4 +418,235 @@ $(function () {
             toast('Cleanup finished: 3 expired posts and 11 media files deleted.');
         }, 1400);
     });
+
+    /* Support analytics: date filters, daily/weekly chart and live refresh */
+    $('[data-support-analytics]').each(function () {
+        var $section = $(this);
+        var url = $section.data('url');
+        var pollMs = Math.max(10, Number($section.data('poll')) || 15) * 1000;
+        var $chart = $section.find('[data-support-chart]');
+        var $custom = $section.find('[data-support-custom]');
+        var $live = $section.find('[data-live-status]');
+        var $pages = $section.find('[data-support-pages]');
+        var number = new Intl.NumberFormat('en');
+        var initial = JSON.parse($section.find('[data-support-initial]').text());
+        var state = { range: initial.range.key, group: initial.group, from: null, to: null };
+        var lastGood = $.extend({}, state);
+        var request = null;
+        var timer = null;
+        var stopped = false;
+
+        function clicks(n) {
+            return number.format(n) + (n === 1 ? ' click' : ' clicks');
+        }
+
+        function formatDate(ymd) {
+            var parts = ymd.split('-');
+            return new Date(parts[0], parts[1] - 1, parts[2])
+                .toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function setLive(mode, text) {
+            $live.toggleClass('is-offline', mode === 'offline').toggleClass('is-stopped', mode === 'stopped');
+            $live.find('[data-live-text]').text(text);
+        }
+
+        function syncControls() {
+            $section.find('[data-range]').each(function () {
+                var on = $(this).data('range') === state.range;
+                $(this).toggleClass('active', on).attr('aria-pressed', on);
+            });
+            $section.find('[data-group]').each(function () {
+                var on = $(this).data('group') === state.group;
+                $(this).toggleClass('active', on).attr('aria-pressed', on);
+            });
+            $custom.prop('hidden', state.range !== 'custom');
+        }
+
+        function renderChart(data) {
+            var bars = data.chart;
+            var max = Math.max.apply(null, [1].concat(bars.map(function (bar) { return bar.clicks; })));
+            var dense = bars.length > 14;
+            var labelEvery = dense ? Math.ceil(bars.length / 10) : 1;
+            var unit = data.group === 'week' ? 'week' : 'day';
+            var peak = bars.reduce(function (best, bar) { return bar.clicks > best.clicks ? bar : best; }, bars[0]);
+
+            $chart.toggleClass('is-dense', dense).empty();
+
+            bars.forEach(function (bar, i) {
+                var $fill = $('<span class="bar-fill">').css('height', Math.round(bar.clicks / max * 90) + '%');
+
+                if (!dense) {
+                    $fill.attr('data-value', bar.clicks);
+                }
+
+                $('<div class="bar">')
+                    .attr('title', bar.title + ': ' + clicks(bar.clicks))
+                    .append($('<div class="bar-track">').append($fill))
+                    .append($('<small>').text(i % labelEvery === 0 ? bar.label : ''))
+                    .appendTo($chart);
+            });
+
+            $chart.attr('aria-label', 'Bar chart of Support button clicks per ' + unit + ': ' + (dense
+                ? clicks(data.range.clicks) + ' in total, busiest ' + unit + ' ' + peak.title + ' with ' + clicks(peak.clicks)
+                : bars.map(function (bar) { return bar.title + ' ' + clicks(bar.clicks); }).join('; ')));
+
+            $section.find('[data-support-empty]').prop('hidden', data.range.clicks > 0);
+        }
+
+        function renderPages(data) {
+            $pages.empty();
+
+            data.topPages.forEach(function (page) {
+                var share = data.range.clicks ? Math.round(page.clicks / data.range.clicks * 100) : 0;
+
+                $('<li>')
+                    .append('<span class="stat-icon ic-orange"><i class="bi bi-link-45deg"></i></span>')
+                    .append($('<div>')
+                        .append($('<a target="_blank" rel="noopener">').attr('href', page.path)
+                            .append($('<strong class="page-path">').text(page.path)))
+                        .append($('<p>').text(clicks(page.clicks) + ' · ' + share + '% of this range')))
+                    .appendTo($pages);
+            });
+
+            $section.find('[data-support-pages-empty]').prop('hidden', data.topPages.length > 0);
+            $section.find('[data-support-pages-summary]').text('Top pages · ' + data.range.label);
+        }
+
+        function render(data) {
+            var dates = data.range.from === data.range.to
+                ? formatDate(data.range.from)
+                : formatDate(data.range.from) + ' – ' + formatDate(data.range.to);
+
+            $section.find('[data-support-stat]').each(function () {
+                var text = number.format(data.stats[$(this).data('support-stat')]);
+
+                if ($(this).text() !== text) {
+                    $(this).text(text).removeClass('is-updated');
+                    void this.offsetWidth; // restart the highlight animation
+                    $(this).addClass('is-updated');
+                }
+            });
+
+            $section.find('[data-support-summary]').text(data.range.label + ' · ' + dates + ' · ' + clicks(data.range.clicks));
+            renderChart(data);
+            renderPages(data);
+            setLive('live', 'Live · updated ' + new Date(data.updatedAt).toLocaleTimeString());
+        }
+
+        function schedule() {
+            clearTimeout(timer);
+
+            if (!stopped) {
+                timer = setTimeout(load, pollMs);
+            }
+        }
+
+        function load() {
+            clearTimeout(timer);
+
+            if (stopped || document.hidden) {
+                return;
+            }
+
+            if (request) {
+                request.abort();
+            }
+
+            var params = { range: state.range, group: state.group };
+
+            if (state.range === 'custom') {
+                params.from = state.from;
+                params.to = state.to;
+            }
+
+            request = $.ajax({
+                url: url,
+                data: params,
+                dataType: 'json',
+                headers: { Accept: 'application/json' }
+            }).done(function (data) {
+                lastGood = $.extend({}, state);
+                render(data);
+            }).fail(function (xhr, status) {
+                if (status === 'abort') return;
+
+                if (xhr.status === 401 || xhr.status === 403 || xhr.status === 419) {
+                    stopped = true;
+                    setLive('stopped', 'Paused · reload the page to resume');
+                    return;
+                }
+
+                if (xhr.status === 422) {
+                    var res = xhr.responseJSON || {};
+                    toast(res.errors ? Object.values(res.errors)[0][0] : (res.message || 'Please check the dates.'), true);
+                    state = $.extend({}, lastGood);
+                    syncControls();
+                    return;
+                }
+
+                setLive('offline', 'Connection lost · retrying');
+            }).always(function (a, status) {
+                if (status !== 'abort') {
+                    request = null;
+                    schedule();
+                }
+            });
+        }
+
+        function applyCustomDates() {
+            var from = $custom.find('[name="from"]').val();
+            var to = $custom.find('[name="to"]').val();
+
+            if (!from || !to) {
+                toast('Choose both a start and an end date.', true);
+                return false;
+            }
+
+            if (from > to) {
+                toast('The end date must be on or after the start date.', true);
+                return false;
+            }
+
+            state.from = from;
+            state.to = to;
+            return true;
+        }
+
+        $section.find('[data-range]').on('click', function () {
+            var range = $(this).data('range');
+
+            if (range === 'custom' && !applyCustomDates()) {
+                return;
+            }
+
+            state.range = range;
+            syncControls();
+            load();
+        });
+
+        $section.find('[data-group]').on('click', function () {
+            state.group = $(this).data('group');
+            syncControls();
+            load();
+        });
+
+        $custom.on('submit', function (e) {
+            e.preventDefault();
+
+            if (applyCustomDates()) {
+                load();
+            }
+        });
+
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden) {
+                load();
+            }
+        });
+
+        render(initial);
+        syncControls();
+        schedule();
+    });
 });

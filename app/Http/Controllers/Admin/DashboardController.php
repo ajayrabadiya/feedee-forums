@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\PostStatus;
+use App\Enums\SupportClickRange;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\ContactMessage;
 use App\Models\Post;
+use App\Models\SupportClick;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -46,6 +48,7 @@ class DashboardController extends Controller
                 ->take(5)
                 ->get(),
             'latestMessages' => ContactMessage::query()->latest()->latest('id')->take(5)->get(),
+            'supportAnalytics' => SupportClick::analytics(SupportClickRange::Last7Days),
         ]);
     }
 

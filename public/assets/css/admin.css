@@ -1330,6 +1330,128 @@ a.stat-card:hover {
     color: inherit;
 }
 
+/* Support analytics */
+.support-analytics {
+    margin-top: 32px;
+    scroll-margin-top: 90px;
+}
+
+.section-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.section-head h2 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.section-head p {
+    margin: 2px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.live-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.live-status.is-offline .dot-live {
+    background: #c9c6bf;
+    box-shadow: 0 0 0 4px rgba(201, 198, 191, .25);
+}
+
+.live-status.is-stopped .dot-live {
+    background: var(--danger);
+    box-shadow: 0 0 0 4px rgba(198, 40, 40, .15);
+}
+
+.stat-card strong.is-updated {
+    animation: stat-bump .8s ease;
+}
+
+@keyframes stat-bump {
+    30% {
+        color: var(--primary);
+        transform: scale(1.06);
+    }
+}
+
+.support-analytics .stat-card strong {
+    transform-origin: left center;
+}
+
+.support-range .range-field {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.support-range .form-control {
+    width: auto;
+    min-height: 40px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.support-range .range-hint {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.support-analytics .view-toggle button {
+    height: 30px;
+    padding: 0 12px;
+}
+
+.chart-empty {
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    text-align: center;
+}
+
+.bar-chart.is-dense {
+    gap: 3px;
+}
+
+.bar-chart.is-dense .bar,
+.bar-chart.is-dense .bar-track {
+    min-width: 0;
+}
+
+.bar-chart.is-dense .bar-fill {
+    border-radius: 3px 3px 1px 1px;
+}
+
+.bar-chart.is-dense .bar small {
+    display: flex;
+    justify-content: center;
+    width: 0;
+    min-height: 18px;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.page-path {
+    overflow-wrap: anywhere;
+}
+
 /* Responsive */
 @media (max-width: 1399.98px) {
     .admin-table .hide-xl {

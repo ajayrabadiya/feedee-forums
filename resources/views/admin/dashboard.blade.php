@@ -176,6 +176,99 @@
                         </section>
                     </div>
                 </div>
+
+                <!-- Support analytics -->
+                @php
+                    $supportStats = $supportAnalytics['stats'];
+                    $supportRange = $supportAnalytics['range'];
+                @endphp
+                <section id="support-analytics" class="support-analytics" aria-labelledby="supportAnalyticsTitle" data-support-analytics data-url="{{ route('admin.support-analytics') }}" data-poll="{{ \App\Models\SupportClick::POLL_SECONDS }}">
+                    <div class="section-head">
+                        <div>
+                            <h2 id="supportAnalyticsTitle">Support analytics</h2>
+                            <p>Visitor clicks on the floating Support button. Clicks by admins are not counted.</p>
+                        </div>
+                        <span class="live-status" data-live-status><span class="dot-live"></span><span data-live-text>Live &middot; refreshes every {{ \App\Models\SupportClick::POLL_SECONDS }}s</span></span>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-sm-6 col-xl-3">
+                            <div class="stat-card">
+                                <div class="stat-top"><span class="stat-icon ic-orange"><i class="bi bi-heart-fill"></i></span></div>
+                                <strong data-support-stat="total">{{ number_format($supportStats['total']) }}</strong>
+                                <span class="label">Total clicks (all time)</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xl-3">
+                            <div class="stat-card">
+                                <div class="stat-top"><span class="stat-icon ic-green"><i class="bi bi-calendar-check"></i></span></div>
+                                <strong data-support-stat="today">{{ number_format($supportStats['today']) }}</strong>
+                                <span class="label">Today's clicks</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xl-3">
+                            <div class="stat-card">
+                                <div class="stat-top"><span class="stat-icon ic-blue"><i class="bi bi-calendar-week"></i></span></div>
+                                <strong data-support-stat="last7Days">{{ number_format($supportStats['last7Days']) }}</strong>
+                                <span class="label">Last 7 days</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xl-3">
+                            <div class="stat-card">
+                                <div class="stat-top"><span class="stat-icon ic-purple"><i class="bi bi-calendar3"></i></span></div>
+                                <strong data-support-stat="thisMonth">{{ number_format($supportStats['thisMonth']) }}</strong>
+                                <span class="label">This month</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-xl-8">
+                            <section class="panel h-100">
+                                <div class="panel-head">
+                                    <div>
+                                        <h2>Support clicks</h2>
+                                        <p data-support-summary>{{ $supportRange['label'] }} &middot; {{ trans_choice('{0} no clicks|{1} :count click|[2,*] :count clicks', $supportRange['clicks'], ['count' => number_format($supportRange['clicks'])]) }}</p>
+                                    </div>
+                                    <div class="view-toggle" role="group" aria-label="Group chart by">
+                                        <button type="button" class="active" data-group="day" aria-pressed="true"><i class="bi bi-bar-chart"></i>Daily</button>
+                                        <button type="button" data-group="week" aria-pressed="false"><i class="bi bi-calendar-week"></i>Weekly</button>
+                                    </div>
+                                </div>
+                                <div class="tabs-line" role="group" aria-label="Date range">
+                                    @foreach (\App\Enums\SupportClickRange::cases() as $range)
+                                        <button type="button" data-range="{{ $range->value }}" @class(['active' => $range->value === $supportRange['key']]) aria-pressed="{{ $range->value === $supportRange['key'] ? 'true' : 'false' }}">{{ $range->label() }}</button>
+                                    @endforeach
+                                </div>
+                                <form class="toolbar support-range" data-support-custom hidden novalidate>
+                                    <label class="range-field">From <input type="date" class="form-control" name="from" value="{{ now()->subDays(29)->toDateString() }}" max="{{ now()->toDateString() }}" required></label>
+                                    <label class="range-field">To <input type="date" class="form-control" name="to" value="{{ now()->toDateString() }}" max="{{ now()->toDateString() }}" required></label>
+                                    <button type="submit" class="btn-fill sm"><i class="bi bi-funnel"></i>Apply</button>
+                                    <span class="range-hint">Up to {{ \App\Models\SupportClick::MAX_RANGE_DAYS }} days</span>
+                                </form>
+                                <div class="panel-body fill">
+                                    <div class="bar-chart" role="img" aria-label="Bar chart of Support button clicks" data-support-chart></div>
+                                    <p class="chart-empty" data-support-empty @if ($supportRange['clicks'] > 0) hidden @endif>No Support clicks in this period yet.</p>
+                                </div>
+                            </section>
+                        </div>
+
+                        <div class="col-xl-4">
+                            <section class="panel h-100">
+                                <div class="panel-head">
+                                    <div>
+                                        <h2>Where visitors click Support</h2>
+                                        <p data-support-pages-summary>Top pages &middot; {{ $supportRange['label'] }}</p>
+                                    </div>
+                                </div>
+                                <ul class="report-list" data-support-pages></ul>
+                                <div class="panel-body text-center muted" data-support-pages-empty @if ($supportAnalytics['topPages'] !== []) hidden @endif>No clicks in this period yet.</div>
+                            </section>
+                        </div>
+                    </div>
+
+                    <script type="application/json" data-support-initial>@json($supportAnalytics)</script>
+                </section>
 @endsection
 
 @push('modals')

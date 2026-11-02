@@ -506,6 +506,20 @@ $(function () {
             setSupportOpen(!$support.hasClass('is-open'));
         });
 
+        /* Click analytics: fire-and-forget, so a failed request never affects the button */
+        var supportTrackUrl = $support.data('track-url');
+
+        if (supportTrackUrl) {
+            $supportBtn.on('click', function () {
+                $.ajax({
+                    url: supportTrackUrl,
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'), Accept: 'application/json' },
+                    data: { page_path: window.location.pathname.slice(0, 255) }
+                });
+            });
+        }
+
         $(document).on('click', function (e) {
             if ($support.hasClass('is-open') && !$(e.target).closest('.support-fab').length) {
                 setSupportOpen(false);
