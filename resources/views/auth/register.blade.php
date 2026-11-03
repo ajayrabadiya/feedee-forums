@@ -1,7 +1,7 @@
 @extends('layouts.auth')
 
 @section('title', 'Sign Up - Feedee Forums')
-@section('description', 'Create a free Feedee Forums account and start sharing stories, recipes and moments with the community.')
+@section('description', 'Create a free Feedee Forums account to post photos and stories and connect with other feedees and feeders.')
 
 @push('meta')
     <link rel="canonical" href="{{ route('register') }}">

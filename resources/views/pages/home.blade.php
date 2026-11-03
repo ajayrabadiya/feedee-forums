@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Feedee Forums - Share stories, recipes and everyday moments')
-@section('description', 'Feedee Forums is a friendly community to share stories, recipes, art, meetups and everyday moments. Browse the latest posts, newest first.')
+@section('title', 'Feedee Forums – Belly Stuffing & Feedee Community')
+@section('description', 'A space for feedee, belly stuffing, belly expansion, and weight gain content. Post photos, stories, and connect with other feedees and feeders.')
 
 @push('meta')
     <link rel="canonical" href="{{ route('home') }}">
@@ -10,8 +10,8 @@
     @endif
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Feedee Forums">
-    <meta property="og:title" content="Feedee Forums - Share stories, recipes and everyday moments">
-    <meta property="og:description" content="A friendly community to share stories, recipes, art, meetups and everyday moments.">
+    <meta property="og:title" content="Feedee Forums – Belly Stuffing &amp; Feedee Community">
+    <meta property="og:description" content="A space for feedee, belly stuffing, belly expansion, and weight gain content. Post photos, stories, and connect with other feedees and feeders.">
     <meta property="og:url" content="{{ route('home') }}">
     <meta property="og:image" content="{{ asset('assets/images/logo.png') }}">
     <meta name="twitter:card" content="summary_large_image">
@@ -24,6 +24,7 @@
         "@@context": "https://schema.org",
         "@type": "WebSite",
         "name": "Feedee Forums",
+        "description": "A space for feedee, belly stuffing, belly expansion, and weight gain content. Post photos, stories, and connect with other feedees and feeders.",
         "url": "{{ route('home') }}",
         "potentialAction": {
             "@type": "SearchAction",
