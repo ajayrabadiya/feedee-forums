@@ -115,11 +115,19 @@ class HomeFeedTest extends TestCase
 
         $response->assertSee('A recipe post');
         $response->assertDontSee('An outdoors post');
-        $this->assertMatchesRegularExpression(
-            '#<a href="'.preg_quote(route('home', ['topic' => 'Recipes']), '#').'"\s+class="active"\s+aria-current="page"#',
-            $response->getContent(),
-        );
-        $response->assertDontSee('<a href="'.route('home', ['topic' => 'Outdoors']).'" class="active"', false);
+        $response->assertSee('<h2>Recipes</h2>', false);
+        $response->assertSee('in this topic');
+        $response->assertSee('All topics');
+    }
+
+    public function test_home_page_has_no_topics_sidebar(): void
+    {
+        $response = $this->get(route('home'));
+
+        $response->assertOk();
+        $response->assertDontSee('class="topic-list"', false);
+        $response->assertDontSee('<i class="bi bi-grid"></i>Topics', false);
+        $response->assertSee('About Feedee Forums');
     }
 
     public function test_unknown_topic_and_array_search_are_ignored(): void
