@@ -5,6 +5,8 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PostModerationController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\SupportAnalyticsController;
+use App\Http\Controllers\Admin\SupportLinkAnalyticsController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CommentController;
@@ -13,6 +15,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SupportClickController;
+use App\Http\Controllers\SupportLinkController;
 use App\Http\Middleware\StoreIntendedUrl;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +25,8 @@ Route::view('/rules', 'pages.rules')->name('rules');
 Route::get('/contact', [ContactController::class, 'show'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contact.store');
 Route::view('/support', 'pages.support')->name('support');
+Route::post('/support/click', SupportClickController::class)->middleware('throttle:30,1')->name('support.click');
+Route::get('/go/{platform}', SupportLinkController::class)->name('support.go');
 
 Route::get('/p/{post}', [PostController::class, 'show'])->where('post', '[A-Za-z0-9]+')->name('posts.show');
 
@@ -54,6 +60,11 @@ Route::middleware('auth')->group(function () {
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/', AdminDashboardController::class)->name('dashboard');
+    Route::get('/support-analytics', SupportAnalyticsController::class)->middleware('throttle:60,1')->name('support-analytics');
+    Route::get('/support-links', [SupportLinkAnalyticsController::class, 'index'])->name('support-links');
+    Route::get('/support-links/data', [SupportLinkAnalyticsController::class, 'data'])->middleware('throttle:60,1')->name('support-links.data');
+    Route::get('/support-links/activity', [SupportLinkAnalyticsController::class, 'activity'])->middleware('throttle:60,1')->name('support-links.activity');
+    Route::get('/support-links/export', [SupportLinkAnalyticsController::class, 'export'])->middleware('throttle:10,1')->name('support-links.export');
     Route::get('/posts', [PostModerationController::class, 'index'])->name('posts');
     Route::post('/posts/moderate', [PostModerationController::class, 'moderate'])->middleware('throttle:60,1')->name('posts.moderate');
     Route::put('/settings/post-approval', [SettingController::class, 'updatePostApproval'])->name('settings.post-approval');

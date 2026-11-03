@@ -4,6 +4,7 @@
             <div class="side-label">Overview</div>
             <ul class="side-nav">
                 <li><a href="{{ route('admin.dashboard') }}"@if (request()->routeIs('admin.dashboard')) class="active" aria-current="page"@endif><i class="bi bi-grid-1x2"></i>Dashboard</a></li>
+                <li><a href="{{ route('admin.support-links') }}"@if (request()->routeIs('admin.support-links*')) class="active" aria-current="page"@endif><i class="bi bi-heart-pulse"></i>Support analytics</a></li>
             </ul>
 
             <div class="side-label">Moderation</div>

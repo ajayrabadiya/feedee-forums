@@ -3,5 +3,6 @@ Disallow: /admin
 Disallow: /api/
 Disallow: /login
 Disallow: /create-post
+Disallow: /go/
 
 Sitemap: https://feedeeforums.com/sitemap.xml

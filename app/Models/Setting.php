@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\SupportPlatform;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
@@ -107,11 +108,11 @@ class Setting extends Model
     {
         $links = [];
 
-        foreach (['youpay' => ['YouPay', 'bi-gift-fill'], 'cashapp' => ['Cash App', 'bi-currency-dollar']] as $key => [$label, $icon]) {
-            $url = static::get("support.{$key}_url");
+        foreach (SupportPlatform::cases() as $platform) {
+            $url = static::get($platform->urlSettingKey());
 
             if (filled($url)) {
-                $links[] = ['key' => $key, 'label' => $label, 'url' => $url, 'note' => static::get("support.{$key}_note"), 'icon' => $icon];
+                $links[] = ['key' => $platform->value, 'label' => $platform->label(), 'url' => $url, 'note' => static::get($platform->noteSettingKey()), 'icon' => $platform->icon()];
             }
         }
 
