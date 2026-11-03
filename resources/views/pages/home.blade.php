@@ -197,16 +197,6 @@
                         </div>
                     </div>
 
-                    <div class="box">
-                        <div class="box-head"><i class="bi bi-grid"></i>Topics</div>
-                        <ul class="topic-list">
-                            <li><a href="{{ route('home') }}" @class(['active' => ! $topic]) @if (! $topic) aria-current="page" @endif><span class="topic-icon t-orange"><i class="bi bi-collection"></i></span>All posts</a></li>
-                            @foreach ($topicStyles as $name => $style)
-                                <li><a href="{{ route('home', ['topic' => $name]) }}" @class(['active' => $topic === $name]) @if ($topic === $name) aria-current="page" @endif><span class="topic-icon {{ $style['color'] }}"><i class="bi {{ $style['icon'] }}"></i></span>{{ $name }}</a></li>
-                            @endforeach
-                        </ul>
-                    </div>
-
                     {{--
                     <div class="support-card">
                         <h3>Keep Feedee Forums running</h3>

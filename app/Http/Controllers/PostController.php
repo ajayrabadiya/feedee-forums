@@ -64,7 +64,6 @@ class PostController extends Controller
             'featuredPosts' => $featuredPosts,
             'search' => $search,
             'topic' => $topic,
-            'topicStyles' => Post::TOPIC_STYLES,
         ]);
     }
 
