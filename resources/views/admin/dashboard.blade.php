@@ -186,7 +186,7 @@
                     <div class="section-head">
                         <div>
                             <h2 id="supportAnalyticsTitle">Support analytics</h2>
-                            <p>Visitor clicks on the floating Support button. Clicks by admins are not counted.</p>
+                            <p>Visitors opening the floating Support button and clicking its payment links. Clicks by admins are not counted, and a click is not a payment.</p>
                         </div>
                         <span class="live-status" data-live-status><span class="dot-live"></span><span data-live-text>Live &middot; refreshes every {{ \App\Models\SupportClick::POLL_SECONDS }}s</span></span>
                     </div>
@@ -220,6 +220,15 @@
                                 <span class="label">This month</span>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="panel link-strip mb-4" data-links-today>
+                        <span class="link-strip-title"><i class="bi bi-cursor-fill"></i>Payment link clicks today</span>
+                        @foreach ($supportAnalytics['links']['platforms'] as $platform)
+                            <span class="link-strip-item" data-links-today-platform="{{ $platform['key'] }}">{{ $platform['label'] }}: <strong>{{ number_format($platform['clicks']) }}</strong> <span>{{ $platform['clicks'] === 1 ? 'click' : 'clicks' }}</span></span>
+                        @endforeach
+                        <span class="link-strip-item" data-links-today-total>Total: <strong>{{ number_format($supportAnalytics['links']['total']) }}</strong> <span>{{ $supportAnalytics['links']['total'] === 1 ? 'support link click' : 'support link clicks' }}</span></span>
+                        <a href="{{ route('admin.support-links') }}" class="link-more">Countries &amp; full report <i class="bi bi-arrow-right"></i></a>
                     </div>
 
                     <div class="row g-4">

@@ -6,6 +6,7 @@ use App\Models\SupportClick;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
@@ -23,10 +24,21 @@ class SupportClickTrackingTest extends TestCase
         $click = SupportClick::sole();
 
         $this->assertNull($click->user_id);
+        $this->assertNull($click->platform);
+        $this->assertNull($click->filtered_as);
         $this->assertSame('/rules', $click->page_path);
-        $this->assertSame('127.0.0.1', $click->ip_address);
-        $this->assertSame('FeedeeTestBrowser/1.0', $click->user_agent);
+        $this->assertSame('Unknown', $click->country_name);
+        $this->assertSame(hash_hmac('sha256', 'guest:127.0.0.1|FeedeeTestBrowser/1.0', config('app.key')), $click->visitor_hash);
         $this->assertSame('2026-11-18 14:30:15', $click->clicked_at->toDateTimeString());
+    }
+
+    public function test_full_ip_addresses_and_user_agents_are_not_stored(): void
+    {
+        $this->postJson(route('support.click'), ['page_path' => '/'], ['User-Agent' => 'FeedeeTestBrowser/1.0'])->assertNoContent();
+
+        $this->assertFalse(Schema::hasColumn('support_clicks', 'ip_address'));
+        $this->assertFalse(Schema::hasColumn('support_clicks', 'user_agent'));
+        $this->assertStringNotContainsString('127.0.0.1', json_encode(SupportClick::sole()->getAttributes()));
     }
 
     public function test_member_click_is_linked_to_the_member(): void

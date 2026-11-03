@@ -2,7 +2,7 @@
     <div class="support-fab"@unless (auth()->user()?->isAdmin()) data-track-url="{{ route('support.click') }}"@endunless>
         <div class="support-dial" id="supportDial" role="group" aria-label="Support options">
             @foreach (array_reverse($support['links']) as $link)
-                <a class="support-dial-item dial-{{ $link['key'] }}" style="--d: {{ count($support['links']) - 1 - $loop->index }}" href="{{ $link['url'] }}" target="_blank" rel="noopener nofollow">
+                <a class="support-dial-item dial-{{ $link['key'] }}" style="--d: {{ count($support['links']) - 1 - $loop->index }}" href="{{ route('support.go', ['platform' => $link['key'], 'from' => '/'.ltrim(request()->path(), '/')]) }}" target="_blank" rel="noopener nofollow">
                     <span class="support-dial-label"><strong>{{ $link['label'] }}</strong>@if (filled($link['note']))<small>{{ $link['note'] }}</small>@endif</span>
                     <span class="support-dial-icon"><i class="bi {{ $link['icon'] }}"></i></span>
                 </a>

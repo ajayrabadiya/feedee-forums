@@ -529,6 +529,17 @@ $(function () {
             });
 
             $section.find('[data-support-summary]').text(data.range.label + ' · ' + dates + ' · ' + clicks(data.range.clicks));
+
+            if (data.links) {
+                data.links.platforms.forEach(function (platform) {
+                    var $item = $section.find('[data-links-today-platform="' + platform.key + '"]');
+                    $item.find('strong').text(number.format(platform.clicks));
+                    $item.children('span').text(platform.clicks === 1 ? 'click' : 'clicks');
+                });
+                var $total = $section.find('[data-links-today-total]');
+                $total.find('strong').text(number.format(data.links.total));
+                $total.children('span').text(data.links.total === 1 ? 'support link click' : 'support link clicks');
+            }
             renderChart(data);
             renderPages(data);
             setLive('live', 'Live · updated ' + new Date(data.updatedAt).toLocaleTimeString());
@@ -648,5 +659,478 @@ $(function () {
         render(initial);
         syncControls();
         schedule();
+    });
+
+    /* Support link analytics page: filters, charts, country report, activity log and CSV export */
+    $('[data-support-links]').each(function () {
+        var $page = $(this);
+        var page = this;
+        var dataUrl = $page.data('url');
+        var activityUrl = $page.data('activity-url');
+        var exportUrl = $page.data('export-url');
+        var report = JSON.parse($page.find('[data-links-initial]').text());
+        var platforms = report.platforms.map(function (p) { return { key: p.key, label: p.label, color: p.color }; });
+        var number = new Intl.NumberFormat('en');
+        var $custom = $page.find('[data-links-custom]');
+        var $chart = $page.find('[data-links-chart]');
+        var $countryTable = $page.find('[data-links-countries]');
+        var $activity = $page.find('[data-links-activity]');
+        var $tip = $('<div class="chart-tip" role="tooltip" hidden></div>').appendTo('body');
+        var isCustom = report.range.key === 'custom';
+        var state = { range: report.range.key, group: report.group, from: isCustom ? report.range.from : null, to: isCustom ? report.range.to : null };
+        var lastGood = $.extend({}, state);
+        var request = null;
+        var activityRequest = null;
+        var activityPage = 1;
+        var activityLastPage = 1;
+        var countryTable = null;
+        var FLAG_URL = 'https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/flags/4x3/';
+
+        function clicks(n) {
+            return number.format(n) + (n === 1 ? ' click' : ' clicks');
+        }
+
+        function formatDate(ymd) {
+            var parts = ymd.split('-');
+            return new Date(parts[0], parts[1] - 1, parts[2])
+                .toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function platformFor(key) {
+            return platforms.filter(function (p) { return p.key === key; })[0] || { key: key, label: key, color: '#999' };
+        }
+
+        function params(extra) {
+            var p = { range: state.range, group: state.group };
+
+            if (state.range === 'custom') {
+                p.from = state.from;
+                p.to = state.to;
+            }
+
+            return $.extend(p, extra || {});
+        }
+
+        /* Flags come from the flag-icons set; a globe stands in for unknown countries */
+        function flag(code) {
+            if (!code) {
+                return $('<span class="flag flag-unknown" aria-hidden="true"><i class="bi bi-globe2"></i></span>');
+            }
+
+            return $('<img class="flag" width="20" height="15" alt="" loading="lazy">').attr('src', FLAG_URL + code.toLowerCase() + '.svg');
+        }
+
+        page.addEventListener('error', function (e) {
+            if (e.target.tagName === 'IMG' && e.target.classList.contains('flag')) {
+                $(e.target).replaceWith(flag(null));
+            }
+        }, true);
+
+        function countryCell(country) {
+            return $('<span class="cell-country">').append(flag(country.code)).append($('<span>').text(country.name));
+        }
+
+        function dot(color) {
+            return $('<span class="pf-dot">').css('--pf', color);
+        }
+
+        /* Change against the previous period of the same length */
+        function delta($el, current, previous, noun) {
+            var compare = 'vs ' + report.range.compareLabel;
+            var title = number.format(previous) + ' ' + noun + ' in ' + report.range.compareLabel;
+
+            if (!previous) {
+                $el.attr('class', current ? 'trend up' : 'trend flat').text(current ? 'New' : 'No change');
+            } else {
+                var pct = Math.round((current - previous) / previous * 100);
+                $el.attr('class', 'trend ' + (pct > 0 ? 'up' : (pct < 0 ? 'down' : 'flat')))
+                    .text((pct > 0 ? '+' : (pct < 0 ? '−' : '')) + Math.abs(pct) + '%');
+            }
+
+            $el.attr({ title: title, 'aria-label': $el.text() + ' ' + compare });
+        }
+
+        /* Tooltips for chart bars and country rows */
+        function tipContent(title, values, total) {
+            var $content = $('<div>').append($('<strong>').text(title));
+
+            platforms.forEach(function (p) {
+                var value = values[p.key] || 0;
+                var share = total ? Math.round(value / total * 100) : 0;
+                $('<div class="tip-line">').append(dot(p.color)).append($('<span>').text(p.label))
+                    .append($('<b>').text(number.format(value) + (total ? ' · ' + share + '%' : ''))).appendTo($content);
+            });
+
+            $('<div class="tip-line tip-total">').append($('<span>').text('Total')).append($('<b>').text(number.format(total))).appendTo($content);
+
+            return $content;
+        }
+
+        function showTip(el) {
+            var info = $(el).data('tip');
+            if (!info) return;
+
+            $tip.empty().append(tipContent(info.title, info.values, info.total)).prop('hidden', false);
+
+            var rect = el.getBoundingClientRect();
+            var left = rect.left + window.scrollX + rect.width / 2 - $tip.outerWidth() / 2;
+            var maxLeft = window.scrollX + document.documentElement.clientWidth - $tip.outerWidth() - 8;
+
+            $tip.css({
+                left: Math.max(window.scrollX + 8, Math.min(left, maxLeft)),
+                top: rect.top + window.scrollY - $tip.outerHeight() - 10
+            });
+        }
+
+        $page.on('mouseenter focus', '.has-tip', function () { showTip(this); })
+            .on('mouseleave blur', '.has-tip', function () { $tip.prop('hidden', true); });
+
+        function renderCards(data) {
+            $page.find('[data-stat="clicks"]').text(number.format(data.totals.clicks));
+            delta($page.find('[data-delta="clicks"]'), data.totals.clicks, data.totals.previousClicks, 'clicks');
+            $page.find('[data-stat="visitors"]').text(number.format(data.totals.visitors));
+            delta($page.find('[data-delta="visitors"]'), data.totals.visitors, data.totals.previousVisitors, 'visitors');
+
+            data.platforms.forEach(function (p) {
+                $page.find('[data-platform-clicks="' + p.key + '"]').text(number.format(p.clicks));
+                $page.find('[data-platform-share="' + p.key + '"]').text('· ' + p.share + '% of clicks');
+                delta($page.find('[data-platform-delta="' + p.key + '"]'), p.clicks, p.previousClicks, 'clicks');
+            });
+
+            $.each(data.periods, function (key, period) {
+                var $card = $page.find('[data-period="' + key + '"]');
+                $card.find('[data-period-total]').text(number.format(period.total));
+                $card.find('[data-period-since]').text(period.since);
+                $.each(period.platforms, function (platform, value) {
+                    $card.find('[data-period-platform="' + platform + '"]').text(number.format(value));
+                });
+            });
+
+            $page.find('[data-filtered-total]').text(number.format(data.filtered.total));
+            data.filtered.reasons.forEach(function (reason) {
+                $page.find('[data-filtered-reason="' + reason.key + '"]').text(number.format(reason.clicks));
+            });
+        }
+
+        function renderActivityChart(data) {
+            var buckets = data.chart;
+            var max = Math.max.apply(null, [1].concat(buckets.map(function (b) { return b.total; })));
+            var dense = buckets.length > 14;
+            var labelEvery = dense ? Math.ceil(buckets.length / 10) : 1;
+            var unit = { day: 'day', week: 'week', month: 'month' }[data.group] || 'day';
+            var peak = buckets.reduce(function (best, b) { return b.total > best.total ? b : best; }, buckets[0]);
+
+            $chart.toggleClass('is-dense', dense).empty();
+
+            buckets.forEach(function (bucket, i) {
+                var $stack = $('<span class="bar-stack">').toggleClass('is-zero', bucket.total === 0)
+                    .css('height', Math.round(bucket.total / max * 90) + '%');
+
+                platforms.forEach(function (p) {
+                    var value = bucket.platforms[p.key] || 0;
+                    if (value) {
+                        $('<span class="bar-seg">').css({ flexGrow: value, background: p.color }).appendTo($stack);
+                    }
+                });
+
+                if (!dense && bucket.total) {
+                    $stack.attr('data-value', bucket.total);
+                }
+
+                $('<div class="bar has-tip" tabindex="0">')
+                    .data('tip', { title: bucket.title, values: bucket.platforms, total: bucket.total })
+                    .attr('aria-label', bucket.title + ': ' + platforms.map(function (p) { return p.label + ' ' + (bucket.platforms[p.key] || 0); }).join(', ') + ', total ' + bucket.total)
+                    .append($('<div class="bar-track">').append($stack))
+                    .append($('<small>').text(i % labelEvery === 0 ? bucket.label : ''))
+                    .appendTo($chart);
+            });
+
+            $chart.attr('aria-label', 'Stacked bar chart of support link clicks per ' + unit + ': ' + clicks(data.totals.clicks) + ' in total'
+                + (peak && peak.total ? ', busiest ' + unit + ' ' + peak.title + ' with ' + clicks(peak.total) : ''));
+            $page.find('[data-links-chart-empty]').prop('hidden', data.totals.clicks > 0);
+            $page.find('[data-activity-summary]').text(clicks(data.totals.clicks) + ' per ' + unit + ', split by platform');
+        }
+
+        function renderComparison(data) {
+            var total = data.totals.clicks;
+            var acc = 0;
+            var stops = [];
+            var $list = $page.find('[data-links-compare]').empty();
+
+            data.platforms.forEach(function (p) {
+                if (total && p.clicks) {
+                    var start = acc / total * 100;
+                    acc += p.clicks;
+                    stops.push(p.color + ' ' + start + '% ' + (acc / total * 100) + '%');
+                }
+
+                $('<li>')
+                    .append($('<div class="compare-head">').append(dot(p.color)).append($('<span>').text(p.label))
+                        .append($('<b>').text(clicks(p.clicks))).append($('<em>').text(p.share + '%')))
+                    .append($('<div class="share-bar">').append($('<span>').css({ width: p.share + '%', background: p.color })))
+                    .append($('<small>').text(number.format(p.visitors) + (p.visitors === 1 ? ' visitor' : ' visitors')))
+                    .appendTo($list);
+            });
+
+            var leader = data.platforms.slice().sort(function (a, b) { return b.clicks - a.clicks; })[0];
+            if (total && leader && data.platforms.filter(function (p) { return p.clicks === leader.clicks; }).length === 1) {
+                $('<li class="compare-leader">').text(leader.label + ' gets the most clicks in this period.').appendTo($list);
+            }
+
+            $page.find('[data-links-donut]')
+                .css('background', total ? 'conic-gradient(' + stops.join(', ') + ')' : '')
+                .attr('aria-label', 'Platform share of clicks: ' + data.platforms.map(function (p) { return p.label + ' ' + p.share + '%'; }).join(', '))
+                .find('[data-donut-total]').text(number.format(total));
+        }
+
+        function renderCountryChart(data) {
+            var top = data.countries.slice(0, 8);
+            var max = top.length ? top[0].total : 1;
+            var $box = $page.find('[data-links-country-chart]').empty();
+
+            top.forEach(function (country) {
+                var $fill = $('<span class="country-fill">').css('width', Math.max(2, country.total / max * 100) + '%');
+
+                platforms.forEach(function (p) {
+                    var value = country.platforms[p.key] || 0;
+                    if (value) {
+                        $('<span>').css({ flexGrow: value, background: p.color }).appendTo($fill);
+                    }
+                });
+
+                $('<div class="country-row has-tip" tabindex="0">')
+                    .data('tip', { title: country.name, values: country.platforms, total: country.total })
+                    .attr('aria-label', country.name + ': ' + platforms.map(function (p) { return p.label + ' ' + (country.platforms[p.key] || 0); }).join(', ') + ', total ' + country.total)
+                    .append(countryCell(country))
+                    .append($('<span class="country-track">').append($fill))
+                    .append($('<b>').text(number.format(country.total)))
+                    .appendTo($box);
+            });
+
+            $page.find('[data-links-country-empty]').prop('hidden', top.length > 0);
+        }
+
+        function renderCountryTable(data) {
+            if (!countryTable) {
+                var columns = [{
+                    data: 'name',
+                    render: function (name, type, row) {
+                        return type === 'display' ? countryCell(row)[0].outerHTML : name;
+                    }
+                }];
+
+                platforms.forEach(function (p) {
+                    columns.push({ data: function (row) { return row.platforms[p.key] || 0; }, render: function (v, type) { return type === 'display' ? number.format(v) : v; } });
+                });
+
+                columns.push({ data: 'total', render: function (v, type) { return type === 'display' ? '<strong>' + number.format(v) + '</strong>' : v; } });
+                columns.push({ data: 'share', render: function (v, type) { return type === 'display' ? v.toFixed(1) + '%' : v; } });
+
+                countryTable = new DataTable($countryTable[0], {
+                    data: data.countries,
+                    columns: columns,
+                    order: [[platforms.length + 1, 'desc']],
+                    autoWidth: false,
+                    pageLength: 10,
+                    layout: { topStart: null, topEnd: null, bottomStart: 'info', bottomEnd: { paging: { firstLast: false } } },
+                    language: {
+                        info: 'Showing _START_ to _END_ of _TOTAL_ countries',
+                        infoEmpty: 'No countries to show',
+                        infoFiltered: '',
+                        zeroRecords: 'No countries match.',
+                        emptyTable: 'No support link clicks in this period.',
+                        paginate: { previous: '<i class="bi bi-chevron-left"></i>', next: '<i class="bi bi-chevron-right"></i>' }
+                    }
+                });
+            } else {
+                countryTable.clear().rows.add(data.countries).draw();
+            }
+
+            var known = data.countries.filter(function (c) { return c.code; }).length;
+            $page.find('[data-country-summary]').text(known + (known === 1 ? ' country' : ' countries') + ' · sorted by total clicks');
+        }
+
+        $page.find('[data-country-search]').on('input', function () {
+            if (countryTable) countryTable.search(this.value).draw();
+        });
+
+        function render(data) {
+            report = data;
+            $page.find('[data-links-summary]').text(data.range.label + ' · '
+                + (data.range.from === data.range.to ? formatDate(data.range.from) : formatDate(data.range.from) + ' – ' + formatDate(data.range.to))
+                + ' · times in ' + data.range.timezone);
+            renderCards(data);
+            renderActivityChart(data);
+            renderComparison(data);
+            renderCountryChart(data);
+            renderCountryTable(data);
+        }
+
+        /* Recent activity (server-side pages) */
+        function renderActivity(res) {
+            var $body = $activity.find('tbody').empty();
+
+            if (!res.data.length) {
+                $('<tr><td colspan="6" class="dt-empty"></td></tr>').find('td').text('No support link clicks in this period.').end().appendTo($body);
+            }
+
+            res.data.forEach(function (row) {
+                var p = platformFor(row.platform);
+                var $clickedFrom = row.page
+                    ? $('<a target="_blank" rel="noopener" class="cell-email">').attr('href', row.page).text(row.page)
+                    : $('<span class="muted">').text('Unknown');
+
+                $('<tr>')
+                    .append($('<td class="nowrap muted">').text(row.time))
+                    .append($('<td>').append(countryCell(row.country)))
+                    .append($('<td>').append($('<span class="pf-badge">').append(dot(p.color)).append($('<span>').text(p.label))))
+                    .append($('<td>').append($clickedFrom))
+                    .append($('<td class="nowrap">').append($('<span>').text(row.visitorType)).append($('<small class="muted">').text(' · #' + row.visitor)))
+                    .append($('<td>').append(row.filtered
+                        ? [$('<span class="status st-rejected">').text('Not counted'), $('<small class="status-reason">').text(row.filtered)]
+                        : $('<span class="status st-approved">').text('Counted')))
+                    .appendTo($body);
+            });
+
+            activityPage = res.meta.page;
+            activityLastPage = res.meta.lastPage;
+            $page.find('[data-activity-info]').text(res.meta.total
+                ? 'Showing ' + number.format(res.meta.from) + ' to ' + number.format(res.meta.to) + ' of ' + clicks(res.meta.total)
+                : 'No clicks to show');
+            $page.find('[data-activity-page-label]').text(activityPage + ' / ' + activityLastPage);
+            $page.find('[data-activity-page="prev"]').prop('disabled', activityPage <= 1).parent().toggleClass('disabled', activityPage <= 1);
+            $page.find('[data-activity-page="next"]').prop('disabled', activityPage >= activityLastPage).parent().toggleClass('disabled', activityPage >= activityLastPage);
+        }
+
+        function loadActivity(pageNumber) {
+            if (activityRequest) activityRequest.abort();
+
+            $activity.closest('.panel').addClass('is-loading');
+
+            activityRequest = $.ajax({
+                url: activityUrl,
+                data: params({ page: pageNumber }),
+                dataType: 'json',
+                headers: { Accept: 'application/json' }
+            }).done(renderActivity).fail(function (xhr, status) {
+                if (status === 'abort') return;
+                toast('Could not load the recent activity. Please try again.', true);
+            }).always(function (a, status) {
+                if (status !== 'abort') {
+                    activityRequest = null;
+                    $activity.closest('.panel').removeClass('is-loading');
+                }
+            });
+        }
+
+        $page.find('[data-activity-page]').on('click', function () {
+            var next = $(this).data('activity-page') === 'next' ? activityPage + 1 : activityPage - 1;
+            if (next >= 1 && next <= activityLastPage) loadActivity(next);
+        });
+
+        /* Filters */
+        function syncControls() {
+            $page.find('[data-range]').each(function () {
+                var on = $(this).data('range') === state.range;
+                $(this).toggleClass('active', on).attr('aria-pressed', on);
+            });
+            $page.find('[data-group]').each(function () {
+                var on = $(this).data('group') === state.group;
+                $(this).toggleClass('active', on).attr('aria-pressed', on);
+            });
+            $custom.prop('hidden', state.range !== 'custom');
+        }
+
+        function syncLinks() {
+            $page.find('[data-export]').each(function () {
+                this.href = exportUrl + '?' + $.param(params({ report: $(this).data('export') }));
+            });
+            window.history.replaceState(null, '', window.location.pathname + '?' + $.param(params()));
+        }
+
+        function load(withActivity) {
+            if (request) request.abort();
+
+            $page.addClass('is-loading');
+
+            request = $.ajax({
+                url: dataUrl,
+                data: params(),
+                dataType: 'json',
+                headers: { Accept: 'application/json' }
+            }).done(function (data) {
+                lastGood = $.extend({}, state);
+                render(data);
+                syncLinks();
+                if (withActivity) loadActivity(1);
+            }).fail(function (xhr, status) {
+                if (status === 'abort') return;
+
+                var res = xhr.responseJSON || {};
+
+                if (xhr.status === 422) {
+                    toast(res.errors ? Object.values(res.errors)[0][0] : (res.message || 'Please check the dates.'), true);
+                } else if (xhr.status === 401 || xhr.status === 403 || xhr.status === 419) {
+                    toast('Your session has expired. Reload the page to continue.', true);
+                } else {
+                    toast('Could not load the analytics. Please try again.', true);
+                }
+
+                state = $.extend({}, lastGood);
+                syncControls();
+            }).always(function (a, status) {
+                if (status !== 'abort') {
+                    request = null;
+                    $page.removeClass('is-loading');
+                }
+            });
+        }
+
+        function applyCustomDates() {
+            var from = $custom.find('[name="from"]').val();
+            var to = $custom.find('[name="to"]').val();
+
+            if (!from || !to) {
+                toast('Choose both a start and an end date.', true);
+                return false;
+            }
+
+            if (from > to) {
+                toast('The end date must be on or after the start date.', true);
+                return false;
+            }
+
+            state.from = from;
+            state.to = to;
+            return true;
+        }
+
+        $page.find('[data-range]').on('click', function () {
+            var range = $(this).data('range');
+
+            if (range === 'custom' && !applyCustomDates()) return;
+
+            state.range = range;
+            syncControls();
+            load(true);
+        });
+
+        $page.find('[data-group]').on('click', function () {
+            state.group = $(this).data('group');
+            syncControls();
+            load(false);
+        });
+
+        $custom.on('submit', function (e) {
+            e.preventDefault();
+            if (applyCustomDates()) load(true);
+        });
+
+        render(report);
+        syncControls();
+        $page.find('[data-export]').each(function () {
+            this.href = exportUrl + '?' + $.param(params({ report: $(this).data('export') }));
+        });
+        loadActivity(1);
     });
 });

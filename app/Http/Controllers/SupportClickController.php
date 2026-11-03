@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSupportClickRequest;
 use App\Models\SupportClick;
 use Illuminate\Http\Response;
-use Illuminate\Support\Str;
 
 class SupportClickController extends Controller
 {
@@ -14,14 +13,8 @@ class SupportClickController extends Controller
      */
     public function __invoke(StoreSupportClickRequest $request): Response
     {
-        $user = $request->user();
-
-        if (! $user?->isAdmin()) {
-            $click = new SupportClick($request->safe()->only(['page_path']));
-            $click->user_id = $user?->id;
-            $click->ip_address = $request->ip();
-            $click->user_agent = Str::limit((string) $request->userAgent(), 255, '') ?: null;
-            $click->save();
+        if (! $request->user()?->isAdmin()) {
+            SupportClick::record($request, pagePath: $request->validated('page_path'));
         }
 
         return response()->noContent();

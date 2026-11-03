@@ -29,7 +29,7 @@ class SupportAnalyticsRequest extends FormRequest
     {
         return [
             'range' => ['sometimes', Rule::enum(SupportClickRange::class)],
-            'group' => ['sometimes', Rule::in(SupportClick::GROUPS)],
+            'group' => ['sometimes', Rule::in($this->groups())],
             'from' => ['exclude_unless:range,custom', 'required', 'date_format:Y-m-d', 'before_or_equal:today'],
             'to' => ['exclude_unless:range,custom', 'required', 'date_format:Y-m-d', 'after_or_equal:from', 'before_or_equal:today'],
         ];
@@ -71,12 +71,30 @@ class SupportAnalyticsRequest extends FormRequest
 
     public function range(): SupportClickRange
     {
-        return SupportClickRange::tryFrom((string) $this->input('range')) ?? SupportClickRange::Last7Days;
+        return SupportClickRange::tryFrom((string) $this->input('range')) ?? $this->defaultRange();
     }
 
     public function group(): string
     {
-        return in_array($this->input('group'), SupportClick::GROUPS, true) ? $this->input('group') : 'day';
+        return in_array($this->input('group'), $this->groups(), true) ? $this->input('group') : 'day';
+    }
+
+    /**
+     * Range used when the request does not pick one.
+     */
+    protected function defaultRange(): SupportClickRange
+    {
+        return SupportClickRange::Last7Days;
+    }
+
+    /**
+     * Chart groupings this endpoint offers.
+     *
+     * @return list<string>
+     */
+    protected function groups(): array
+    {
+        return SupportClick::GROUPS;
     }
 
     /**

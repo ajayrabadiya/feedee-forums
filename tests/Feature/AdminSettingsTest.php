@@ -62,9 +62,12 @@ class AdminSettingsTest extends TestCase
         $response = $this->get(route('home'));
 
         $response->assertSee('class="support-fab"', false);
-        $response->assertSee('href="https://youpay.me/zaiyaxx"', false);
-        $response->assertSee('href="https://cash.app/$zaiyaxx"', false);
+        $response->assertSee('href="'.route('support.go', ['platform' => 'youpay', 'from' => '/']).'"', false);
+        $response->assertSee('href="'.route('support.go', ['platform' => 'cashapp', 'from' => '/']).'"', false);
         $response->assertSee('$zaiyaxx · US only');
+
+        $this->get(route('support.go', 'youpay'))->assertRedirect('https://youpay.me/zaiyaxx');
+        $this->get(route('support.go', 'cashapp'))->assertRedirect('https://cash.app/$zaiyaxx');
     }
 
     public function test_admin_can_change_support_links_and_frontend_updates(): void
@@ -80,10 +83,13 @@ class AdminSettingsTest extends TestCase
         auth()->logout();
         $response = $this->get(route('login'));
 
-        $response->assertSee('href="https://youpay.me/newname"', false);
+        $response->assertSee('href="'.route('support.go', ['platform' => 'youpay', 'from' => '/login']).'"', false);
         $response->assertSee('Wishlist gifts');
+        $response->assertDontSee(route('support.go', 'cashapp'), false);
         $response->assertDontSee('cash.app', false);
-        $response->assertDontSee('youpay.me/zaiyaxx', false);
+
+        $this->get(route('support.go', 'youpay'))->assertRedirect('https://youpay.me/newname');
+        $this->get(route('support.go', 'cashapp'))->assertNotFound();
     }
 
     public function test_support_button_can_be_turned_off(): void
