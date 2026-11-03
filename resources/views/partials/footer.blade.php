@@ -3,7 +3,7 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <img src="{{ asset('assets/images/logo.png') }}" alt="Feedee Forums" width="160" height="40" loading="lazy">
-                    <p>A warm, friendly place to share stories, recipes, art and everyday moments. Every post is kept for 30 days, then permanently deleted.</p>
+                    <p>A space for feedee, belly stuffing, belly expansion, and weight gain content. Post photos, stories, and connect with other feedees and feeders.</p>
                 </div>
                 <div>
                     <h4>Community</h4>
