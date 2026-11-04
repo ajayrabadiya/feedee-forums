@@ -2443,6 +2443,33 @@ textarea.form-control {
     font-weight: 500;
 }
 
+.turnstile-field .cf-turnstile {
+    min-height: 65px;
+}
+
+.auth-notice {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid #bfe6cf;
+    border-radius: var(--radius-sm);
+    background: #effaf3;
+    color: var(--body);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.auth-notice i {
+    color: #1b7f4f;
+    font-size: 20px;
+}
+
+.auth-notice strong {
+    display: block;
+    color: var(--text);
+    font-weight: 600;
+}
+
 /* Error page */
 .error-page {
     padding: 90px 0 110px;

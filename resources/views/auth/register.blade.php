@@ -78,10 +78,7 @@
             @enderror
         </div>
 
-        <div class="turnstile mb-4" aria-label="Security check">
-            <i class="bi bi-cloud-check-fill"></i>
-            <div><strong>Verifying you're human</strong>Protected by Cloudflare Turnstile</div>
-        </div>
+        @include('partials.turnstile')
 
         <button type="submit" class="btn-fill">Create account</button>
     </form>

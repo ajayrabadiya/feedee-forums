@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Rules\Turnstile;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -36,6 +37,7 @@ class LoginRequest extends FormRequest
             'login' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string'],
             'remember' => ['nullable', 'boolean'],
+            ...Turnstile::rules($this->ip()),
         ];
     }
 
@@ -46,6 +48,7 @@ class LoginRequest extends FormRequest
     {
         return [
             'login.required' => 'Please enter your email or username.',
+            Turnstile::FIELD.'.required' => 'Please complete the security check.',
         ];
     }
 

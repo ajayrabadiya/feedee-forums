@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use App\Models\User;
+use App\Rules\Turnstile;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
@@ -29,6 +30,7 @@ class RegisterRequest extends FormRequest
         return [
             ...self::accountRules(),
             'terms' => ['accepted'],
+            ...Turnstile::rules($this->ip()),
         ];
     }
 
@@ -56,6 +58,7 @@ class RegisterRequest extends FormRequest
             'username.unique' => 'That username is already taken.',
             'email.unique' => 'An account with that email already exists.',
             'terms.accepted' => 'Please confirm you are 18 or older and agree to the community rules.',
+            Turnstile::FIELD.'.required' => 'Please complete the security check.',
         ];
     }
 
