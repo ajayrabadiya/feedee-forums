@@ -2292,6 +2292,14 @@ textarea.form-control {
     line-height: 1.25;
 }
 
+.auth-support {
+    max-width: 440px;
+    margin: -8px 0 24px;
+    color: #cfcfcf;
+    font-size: 16px;
+    line-height: 1.55;
+}
+
 .auth-points {
     list-style: none;
 }
