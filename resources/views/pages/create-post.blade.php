@@ -32,7 +32,7 @@
                     @if ($editing)
                         @method('put')
                         <h1 class="section-title">Edit post</h1>
-                        <p class="section-sub">Update your title, topic and text, remove photos or videos, or add new ones.</p>
+                        <p class="section-sub">Update your title and text, remove photos or videos, or add new ones.</p>
                     @else
                         <h1 class="section-title">Create a post</h1>
                         <p class="section-sub">Share a story, a few photos or short videos. Keep it kind and follow the community rules.</p>
@@ -59,22 +59,6 @@
                                 <p class="form-error" role="alert">{{ $message }}</p>
                             @enderror
                             <p class="form-error" id="titleUrlError" aria-live="polite" hidden></p>
-                        </div>
-
-                        @php
-                            $selectedTopic = old('topic', $editing ? $post->topic : null);
-                        @endphp
-                        <div class="mb-3">
-                            <label class="form-label" for="topic">Topic</label>
-                            <select @class(['form-select', 'has-error' => $errors->has('topic')]) id="topic" name="topic" required>
-                                <option value="" @selected(! $selectedTopic) disabled>Choose a topic</option>
-                                @foreach ($topics as $topic)
-                                    <option value="{{ $topic }}" @selected($selectedTopic === $topic)>{{ $topic }}</option>
-                                @endforeach
-                            </select>
-                            @error('topic')
-                                <p class="form-error" role="alert">{{ $message }}</p>
-                            @enderror
                         </div>
 
                         <div>
@@ -231,7 +215,6 @@
                         <div class="box-head"><i class="bi bi-lightbulb"></i>Posting tips</div>
                         <div class="box-body">
                             <ul class="check-list">
-                                <li><i class="bi bi-check-circle-fill"></i>Pick the topic that fits best</li>
                                 <li><i class="bi bi-check-circle-fill"></i>Describe each photo in a few words</li>
                                 <li><i class="bi bi-check-circle-fill"></i>Keep videos short and steady</li>
                                 <li><i class="bi bi-check-circle-fill"></i>Blur faces of people who didn't agree to be shown</li>

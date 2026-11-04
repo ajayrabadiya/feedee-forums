@@ -71,7 +71,6 @@ class PostController extends Controller
     {
         return view('pages.create-post', [
             'requiresApproval' => Setting::requiresPostApproval() && ! $request->user()->isAdmin(),
-            'topics' => Post::TOPICS,
             'images' => config('media.images'),
             'videos' => config('media.videos'),
         ]);
@@ -84,7 +83,7 @@ class PostController extends Controller
 
         try {
             $post = DB::transaction(function () use ($request, $disk, &$storedPaths): Post {
-                $post = $request->user()->posts()->make($request->safe()->only(['title', 'topic', 'body']));
+                $post = $request->user()->posts()->make($request->safe()->only(['title', 'body']));
                 $post->status = Setting::requiresPostApproval() && ! $request->user()->isAdmin()
                     ? PostStatus::Pending
                     : PostStatus::Approved;
@@ -102,7 +101,7 @@ class PostController extends Controller
             report($exception);
 
             return back()
-                ->withInput($request->safe()->only(['title', 'topic', 'body']))
+                ->withInput($request->safe()->only(['title', 'body']))
                 ->withErrors(['media' => "We couldn't save your post and its media. Please try again."]);
         }
 
@@ -144,7 +143,6 @@ class PostController extends Controller
 
         return view('pages.create-post', [
             'post' => $post,
-            'topics' => Post::TOPICS,
             'images' => config('media.images'),
             'videos' => config('media.videos'),
             'existingImages' => $post->media->filter->isImage()->values(),
@@ -159,7 +157,7 @@ class PostController extends Controller
 
         try {
             $removedMedia = DB::transaction(function () use ($request, $post, $disk, &$storedPaths): Collection {
-                $post->update($request->safe()->only(['title', 'topic', 'body']));
+                $post->update($request->safe()->only(['title', 'body']));
 
                 if ($post->isRejected() && $post->user_id === $request->user()->id) {
                     $post->resubmit();
@@ -184,7 +182,7 @@ class PostController extends Controller
             report($exception);
 
             return back()
-                ->withInput($request->safe()->only(['title', 'topic', 'body', 'remove_media']))
+                ->withInput($request->safe()->only(['title', 'body', 'remove_media']))
                 ->withErrors(['media' => "We couldn't save your changes. Your post is unchanged, please try again."]);
         }
 
