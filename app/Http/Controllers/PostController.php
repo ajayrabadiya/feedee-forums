@@ -211,12 +211,8 @@ class PostController extends Controller
      */
     private function attachUploads(StorePostRequest $request, Post $post, string $disk, array &$storedPaths): void
     {
-        $altTexts = $request->input('alt_text', []);
-
-        foreach ($request->file('photos', []) as $index => $photo) {
-            $altText = is_array($altTexts) && is_string($altTexts[$index] ?? null) ? $altTexts[$index] : null;
-
-            $this->attachMedia($post, $photo, MediaType::Image, $disk, $storedPaths, $altText);
+        foreach ($request->file('photos', []) as $photo) {
+            $this->attachMedia($post, $photo, MediaType::Image, $disk, $storedPaths);
         }
 
         foreach ($request->file('videos', []) as $video) {
@@ -229,7 +225,7 @@ class PostController extends Controller
      *
      * @param  list<string>  $storedPaths
      */
-    private function attachMedia(Post $post, UploadedFile $file, MediaType $type, string $disk, array &$storedPaths, ?string $altText = null): void
+    private function attachMedia(Post $post, UploadedFile $file, MediaType $type, string $disk, array &$storedPaths): void
     {
         $path = $file->store($type->directory(), $disk);
 
@@ -244,7 +240,7 @@ class PostController extends Controller
             'disk' => $disk,
             'file_path' => $path,
             'original_name' => $this->safeOriginalName($file),
-            'alt_text' => $altText !== null ? Str::limit(trim($altText), 150, '') : null,
+            'alt_text' => null,
             'mime_type' => $file->getMimeType(),
             'file_size' => $file->getSize(),
         ]);

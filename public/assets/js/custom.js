@@ -411,12 +411,6 @@ $(function () {
                 })
                 .appendTo($item);
 
-            if (kind === 'image') {
-                $('<input type="text" name="alt_text[]" maxlength="150" required>')
-                    .attr({ placeholder: 'Describe this image (alt text)', 'aria-label': 'Alt text for ' + file.name })
-                    .appendTo($item);
-            }
-
             $grid.append($item);
         }
 

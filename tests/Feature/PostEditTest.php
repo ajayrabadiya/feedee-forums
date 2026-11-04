@@ -123,7 +123,6 @@ class PostEditTest extends TestCase
 
         $this->actingAs($owner)->put(route('posts.update', $post), $this->payload([
             'photos' => [UploadedFile::fake()->image('new.png', 300, 200)],
-            'alt_text' => ['A brand new photo'],
             'videos' => [UploadedFile::fake()->create('new.webm', 500, 'video/webm')],
             'agree' => '1',
         ]))->assertSessionHasNoErrors();
@@ -132,7 +131,7 @@ class PostEditTest extends TestCase
         $this->assertSame(2, $post->videos()->count());
 
         $newImage = $post->images()->get()->last();
-        $this->assertSame('A brand new photo', $newImage->alt_text);
+        $this->assertNull($newImage->alt_text);
         $this->assertSame('image/png', $newImage->mime_type);
         $this->assertStringStartsWith('posts/images/', $newImage->file_path);
         $this->disk()->assertExists($newImage->file_path);

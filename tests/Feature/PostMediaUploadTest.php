@@ -86,7 +86,6 @@ class PostMediaUploadTest extends TestCase
 
         $this->actingAs($user)->post(route('posts.store'), $this->payload([
             'photos' => [UploadedFile::fake()->image('Cinnamon Rolls!.jpg', 800, 600)],
-            'alt_text' => ['Tray of cinnamon rolls'],
         ]))->assertSessionHasNoErrors();
 
         $media = PostMedia::sole();
@@ -98,7 +97,7 @@ class PostMediaUploadTest extends TestCase
         $this->assertStringNotContainsString('Cinnamon', $media->file_path);
         $this->assertSame('image/jpeg', $media->mime_type);
         $this->assertSame('Cinnamon Rolls.jpg', $media->original_name);
-        $this->assertSame('Tray of cinnamon rolls', $media->alt_text);
+        $this->assertNull($media->alt_text);
         $this->assertGreaterThan(0, $media->file_size);
         $this->assertSame($user->id, $media->post->user_id);
         $this->disk()->assertExists($media->file_path);
@@ -250,7 +249,6 @@ class PostMediaUploadTest extends TestCase
     {
         $this->actingAs(User::factory()->create())->post(route('posts.store'), $this->payload([
             'photos' => [UploadedFile::fake()->image('a.jpg'), UploadedFile::fake()->image('b.jpg')],
-            'alt_text' => ['First photo', 'Second photo'],
             'videos' => [UploadedFile::fake()->create('clip.webm', 100, 'video/webm')],
         ]));
 
@@ -263,7 +261,7 @@ class PostMediaUploadTest extends TestCase
             $this->assertStringContainsString('/storage/'.$media->file_path, $url);
             $response->assertSee($url, false);
         }
-        $response->assertSee('alt="First photo"', false);
+        $response->assertSee('alt="Photo 1 from', false);
         $response->assertSee('<source src="'.$this->disk()->url($post->videos->first()->file_path).'" type="video/webm">', false);
         $response->assertSee('preload="metadata"', false);
         $response->assertSee('2 photos');

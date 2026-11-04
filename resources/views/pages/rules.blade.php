@@ -116,7 +116,7 @@
                             </ul>
                         </div>
                     </div>
-                    <p>Please add a short description (alt text) to every photo so members using screen readers can enjoy your post too. Please remove location data from photos before you share them.</p>
+                    <p>Please remove location data from photos before you share them.</p>
                 </section>
 
                 <section class="panel-card prose" id="deletion">

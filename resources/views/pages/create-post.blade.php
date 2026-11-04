@@ -74,13 +74,13 @@
                     </div>
 
                     @php
-                        $photoErrors = collect($errors->get('photos*'))->merge($errors->get('alt_text*'))->merge($errors->get('remove_media*'))->flatten()->unique();
+                        $photoErrors = collect($errors->get('photos*'))->merge($errors->get('remove_media*'))->flatten()->unique();
                         $videoErrors = collect($errors->get('videos*'))->flatten()->unique();
                     @endphp
 
                     <div class="form-section">
                         <h2 class="form-section-title">Photos <span class="opt">(optional)</span></h2>
-                        <p class="form-section-sub">Up to {{ $images['max_files'] }} photos. {{ $images['label'] }}, {{ \App\Http\Requests\StorePostRequest::formatKb($images['max_kb']) }} max each. Add a short description to each photo so everyone can enjoy it.</p>
+                        <p class="form-section-sub">Up to {{ $images['max_files'] }} photos. {{ $images['label'] }}, {{ \App\Http\Requests\StorePostRequest::formatKb($images['max_kb']) }} max each.</p>
 
                         @if ($editing && $existingImages->isNotEmpty())
                             <p class="existing-label">Current photos <span>Select <i class="bi bi-x-lg"></i> to remove a photo when you save.</span></p>
@@ -215,7 +215,6 @@
                         <div class="box-head"><i class="bi bi-lightbulb"></i>Posting tips</div>
                         <div class="box-body">
                             <ul class="check-list">
-                                <li><i class="bi bi-check-circle-fill"></i>Describe each photo in a few words</li>
                                 <li><i class="bi bi-check-circle-fill"></i>Keep videos short and steady</li>
                                 <li><i class="bi bi-check-circle-fill"></i>Blur faces of people who didn't agree to be shown</li>
                             </ul>

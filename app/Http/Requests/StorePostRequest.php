@@ -40,8 +40,6 @@ class StorePostRequest extends FormRequest
                 'mimetypes:'.implode(',', $images['mime_types']),
                 'max:'.$images['max_kb'],
             ],
-            'alt_text' => ['nullable', 'array', 'max:'.$images['max_files']],
-            'alt_text.*' => ['nullable', 'string', 'max:150'],
             'videos' => ['nullable', 'array', 'max:'.$videos['max_files']],
             'videos.*' => [
                 'required',
@@ -76,7 +74,6 @@ class StorePostRequest extends FormRequest
             'videos.*.extensions' => 'Videos must be '.$videos['label'].' files.',
             'videos.*.mimetypes' => 'Videos must be '.$videos['label'].' files.',
             'videos.*.max' => 'Each video must be '.self::formatKb($videos['max_kb']).' or smaller.',
-            'alt_text.*.max' => 'Photo descriptions can be up to 150 characters.',
         ];
     }
 
@@ -88,7 +85,6 @@ class StorePostRequest extends FormRequest
         return [
             'photos.*' => 'photo',
             'videos.*' => 'video',
-            'alt_text.*' => 'photo description',
         ];
     }
 
