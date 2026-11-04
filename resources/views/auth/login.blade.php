@@ -38,7 +38,7 @@
         <div class="mb-3">
             <div class="label-row">
                 <label class="form-label" for="password">Password</label>
-                <a href="#" class="link small">Forgot password?</a>
+                <a href="{{ route('password.request') }}" class="link small">Forgot password?</a>
             </div>
             <div class="input-icon">
                 <i class="bi bi-lock"></i>
