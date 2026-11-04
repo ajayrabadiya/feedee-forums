@@ -2443,6 +2443,10 @@ textarea.form-control {
     font-weight: 500;
 }
 
+.turnstile-field .cf-turnstile {
+    min-height: 65px;
+}
+
 /* Error page */
 .error-page {
     padding: 90px 0 110px;

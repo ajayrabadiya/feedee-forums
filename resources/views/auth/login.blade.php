@@ -55,10 +55,7 @@
             <label class="form-check-label" for="remember">Keep me logged in</label>
         </div>
 
-        <div class="turnstile mb-4" aria-label="Security check">
-            <i class="bi bi-cloud-check-fill"></i>
-            <div><strong>Verifying you're human</strong>Protected by Cloudflare Turnstile</div>
-        </div>
+        @include('partials.turnstile')
 
         <button type="submit" class="btn-fill">Log in</button>
     </form>
