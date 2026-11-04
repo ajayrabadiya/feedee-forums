@@ -9,11 +9,12 @@
 
 @section('side')
     <span class="eyebrow"><i class="bi bi-stars"></i>Join the community</span>
-    <h2>A kinder corner of the internet starts here.</h2>
+    <h2>Where feedees and stuffers actually belong</h2>
+    <p class="auth-support">Share progress, recipes, stories, and connect with people who get it.</p>
     <ul class="auth-points">
-        <li><i class="bi bi-chat-heart"></i>Share recipes, art, meetups and stories</li>
-        <li><i class="bi bi-lock"></i>Your email is never shown publicly</li>
-        <li><i class="bi bi-hourglass-split"></i>Nothing lingers: posts are deleted after 30 days</li>
+        <li><i class="bi bi-chat-heart"></i>Share stuffing progress, recipes &amp; real stories</li>
+        <li><i class="bi bi-lock"></i>Your email stays completely private</li>
+        <li><i class="bi bi-hourglass-split"></i>Nothing lingers &mdash; posts auto-delete after 30 days</li>
     </ul>
 @endsection
 
