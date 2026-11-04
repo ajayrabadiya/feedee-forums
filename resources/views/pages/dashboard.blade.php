@@ -120,7 +120,6 @@
                         <ol class="mini-rules">
                             <li>Be kind and respectful</li>
                             <li>Stay on topic</li>
-                            <li>No spam or self-promotion</li>
                             <li>Respect everyone's privacy</li>
                         </ol>
                     </div>
