@@ -31,7 +31,7 @@
                             <li><a href="{{ route('login', ['redirect' => request()->getRequestUri()]) }}">Log in</a></li>
                             <li><a href="{{ route('register', ['redirect' => request()->getRequestUri()]) }}">Sign up</a></li>
                         @endauth
-                        <li><a href="{{ asset('sitemap.xml') }}">Sitemap</a></li>
+                        <li><a href="{{ route('sitemap') }}">Sitemap</a></li>
                     </ul>
                 </div>
             </div>

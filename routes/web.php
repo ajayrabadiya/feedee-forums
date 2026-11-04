@@ -15,6 +15,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SupportClickController;
 use App\Http\Controllers\SupportLinkController;
 use App\Http\Middleware\StoreIntendedUrl;
@@ -25,6 +26,7 @@ Route::view('/rules', 'pages.rules')->name('rules');
 Route::get('/contact', [ContactController::class, 'show'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contact.store');
 Route::view('/support', 'pages.support')->name('support');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::post('/support/click', SupportClickController::class)->middleware('throttle:30,1')->name('support.click');
 Route::get('/go/{platform}', SupportLinkController::class)->name('support.go');
 
