@@ -29,7 +29,20 @@ class StorePostRequest extends FormRequest
 
         return [
             'title' => ['required', 'string', 'max:150', new NoUrls('Links aren\'t allowed in the title. Describe your post in words instead.')],
-            'body' => ['nullable', 'string', 'max:3000'],
+            'body' => [
+                'nullable',
+                'string',
+                'max:12000',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (! is_string($value)) {
+                        return;
+                    }
+
+                    if (mb_strlen(Post::plainBody($value)) > Post::BODY_MAX_LENGTH) {
+                        $fail('Your post may not be greater than '.Post::BODY_MAX_LENGTH.' characters.');
+                    }
+                },
+            ],
             'photos' => ['nullable', 'array', 'max:'.$images['max_files']],
             'photos.*' => [
                 'required',
@@ -92,6 +105,10 @@ class StorePostRequest extends FormRequest
     {
         if (is_string($this->input('title'))) {
             $this->merge(['title' => trim($this->input('title'))]);
+        }
+
+        if ($this->exists('body')) {
+            $this->merge(['body' => Post::sanitizeBody(is_string($this->input('body')) ? $this->input('body') : null)]);
         }
     }
 

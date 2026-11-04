@@ -13,6 +13,10 @@
     <meta name="robots" content="noindex, nofollow">
 @endpush
 
+@push('head')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css">
+@endpush
+
 @section('content')
     <main id="main" class="container page">
         <ol class="crumbs light" aria-label="Breadcrumb">
@@ -63,10 +67,24 @@
 
                         <div>
                             <div class="label-row">
-                                <label class="form-label" for="body">Your post <span class="opt">(optional)</span></label>
-                                <span class="char-count" id="bodyCount">0 / 3000</span>
+                                <label class="form-label" for="bodyEditor">Your post <span class="opt">(optional)</span></label>
+                                <span class="char-count" id="bodyCount">0 / {{ \App\Models\Post::BODY_MAX_LENGTH }}</span>
                             </div>
-                            <textarea @class(['form-control', 'has-error' => $errors->has('body')]) id="body" name="body" maxlength="3000" placeholder="What would you like to share?" data-counter="#bodyCount">{{ old('body', $editing ? $post->body : null) }}</textarea>
+                            @php
+                                $bodyValue = old('body', $editing ? $post->body : null);
+                            @endphp
+                            <div @class(['post-editor', 'has-error' => $errors->has('body')])>
+                                <div
+                                    id="bodyEditor"
+                                    class="post-editor-surface"
+                                    data-post-editor
+                                    data-input="#body"
+                                    data-counter="#bodyCount"
+                                    data-max="{{ \App\Models\Post::BODY_MAX_LENGTH }}"
+                                    data-placeholder="What would you like to share?"
+                                >{!! \App\Models\Post::bodyForEditor($bodyValue) !!}</div>
+                                <textarea id="body" name="body" hidden>{{ $bodyValue }}</textarea>
+                            </div>
                             @error('body')
                                 <p class="form-error" role="alert">{{ $message }}</p>
                             @enderror
@@ -234,3 +252,53 @@
         </div>
     </main>
 @endsection
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+    <script>
+        $(function () {
+            var $surface = $('[data-post-editor]');
+            if (! $surface.length || typeof Quill === 'undefined') return;
+
+            var $input = $($surface.data('input'));
+            var $counter = $($surface.data('counter'));
+            var max = parseInt($surface.data('max'), 10) || 3000;
+            var quill = new Quill($surface[0], {
+                theme: 'snow',
+                placeholder: $surface.data('placeholder') || '',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline'],
+                        [{ list: 'ordered' }, { list: 'bullet' }],
+                        ['blockquote'],
+                        ['clean']
+                    ]
+                }
+            });
+
+            function plainLength() {
+                return (quill.getText() || '').replace(/\n$/, '').length;
+            }
+
+            function sync() {
+                var html = quill.root.innerHTML;
+                var plain = plainLength();
+                var isEmpty = plain === 0;
+
+                $input.val(isEmpty ? '' : html);
+                $counter.text(plain + ' / ' + max);
+                $surface.closest('.post-editor').toggleClass('is-over', plain > max);
+            }
+
+            quill.on('text-change', function () {
+                if (plainLength() > max) {
+                    quill.deleteText(max, quill.getLength());
+                }
+                sync();
+            });
+
+            $('#postForm').on('submit', sync);
+            sync();
+        });
+    </script>
+@endpush
