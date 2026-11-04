@@ -75,26 +75,19 @@
                     <div class="rule-item">
                         <span class="rule-num">3</span>
                         <div>
-                            <h3>No spam or self-promotion</h3>
-                            <p>No ads, referral links, repeated posts or schemes. Sharing your own creative work is welcome; selling it in every post is not.</p>
-                        </div>
-                    </div>
-                    <div class="rule-item">
-                        <span class="rule-num">4</span>
-                        <div>
                             <h3>Respect everyone's privacy</h3>
                             <p>Never share someone's personal details, private messages or photos of them without their permission.</p>
                         </div>
                     </div>
                     <div class="rule-item">
-                        <span class="rule-num">5</span>
+                        <span class="rule-num">4</span>
                         <div>
                             <h3>Only post what you have the right to share</h3>
                             <p>Upload photos and videos you took yourself or have permission to use. Credit the original creator when sharing their work.</p>
                         </div>
                     </div>
                     <div class="rule-item">
-                        <span class="rule-num">6</span>
+                        <span class="rule-num">5</span>
                         <div>
                             <h3>Keep it legal and safe</h3>
                             <p>No illegal content, threats, dangerous activities or anything that puts someone at risk. Members must be 18 or older.</p>
