@@ -61,7 +61,9 @@
                                     @elseif ($post->is_featured)
                                         <span class="post-status featured"><i class="bi bi-star-fill"></i>Featured</span>
                                     @endif
-                                    <span class="topic">{{ $post->topic }}</span>
+                                    @if ($post->topic)
+                                        <span class="topic">{{ $post->topic }}</span>
+                                    @endif
                                     <span><i class="bi bi-clock"></i>Posted {{ $post->created_at->diffForHumans() }}</span>
                                     @if ($postImages->isNotEmpty())
                                         <span><i class="bi bi-images"></i>{{ trans_choice('{1} :count photo|[2,*] :count photos', $postImages->count()) }}</span>

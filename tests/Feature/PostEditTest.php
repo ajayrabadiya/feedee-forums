@@ -55,7 +55,6 @@ class PostEditTest extends TestCase
     {
         return [
             'title' => 'Updated title',
-            'topic' => 'Outdoors',
             'body' => 'Updated body text.',
             ...$overrides,
         ];
@@ -73,7 +72,8 @@ class PostEditTest extends TestCase
         $response->assertSee('action="'.route('posts.update', $post).'"', false);
         $response->assertSee('name="_method" value="put"', false);
         $response->assertSee('value="Original title"', false);
-        $response->assertSee('<option value="Recipes" selected>Recipes</option>', false);
+        $response->assertDontSee('name="topic"', false);
+        $response->assertDontSee('Choose a topic');
         $response->assertSee('Original body text.</textarea>', false);
         $response->assertSee($this->disk()->url($image->file_path), false);
         $response->assertSee($this->disk()->url($video->file_path), false);
@@ -83,20 +83,22 @@ class PostEditTest extends TestCase
         $response->assertSee('href="'.route('posts.show', $post).'" class="btn-soft">Cancel', false);
     }
 
-    public function test_owner_can_update_title_topic_and_body_keeping_media(): void
+    public function test_owner_can_update_title_and_body_keeping_media(): void
     {
         $owner = User::factory()->create();
         [$post, $image, $video] = $this->postWithMedia($owner);
         $createdAt = $post->created_at;
 
-        $response = $this->actingAs($owner)->put(route('posts.update', $post), $this->payload());
+        $response = $this->actingAs($owner)->put(route('posts.update', $post), $this->payload([
+            'topic' => 'Outdoors',
+        ]));
 
         $response->assertRedirect(route('posts.show', $post));
         $response->assertSessionHas('status', 'Your post has been updated.');
 
         $post->refresh();
         $this->assertSame('Updated title', $post->title);
-        $this->assertSame('Outdoors', $post->topic);
+        $this->assertSame('Recipes', $post->topic);
         $this->assertSame('Updated body text.', $post->body);
         $this->assertTrue($createdAt->equalTo($post->created_at));
         $this->assertSame(2, $post->media()->count());
@@ -121,7 +123,6 @@ class PostEditTest extends TestCase
 
         $this->actingAs($owner)->put(route('posts.update', $post), $this->payload([
             'photos' => [UploadedFile::fake()->image('new.png', 300, 200)],
-            'alt_text' => ['A brand new photo'],
             'videos' => [UploadedFile::fake()->create('new.webm', 500, 'video/webm')],
             'agree' => '1',
         ]))->assertSessionHasNoErrors();
@@ -130,7 +131,7 @@ class PostEditTest extends TestCase
         $this->assertSame(2, $post->videos()->count());
 
         $newImage = $post->images()->get()->last();
-        $this->assertSame('A brand new photo', $newImage->alt_text);
+        $this->assertNull($newImage->alt_text);
         $this->assertSame('image/png', $newImage->mime_type);
         $this->assertStringStartsWith('posts/images/', $newImage->file_path);
         $this->disk()->assertExists($newImage->file_path);
@@ -273,7 +274,6 @@ class PostEditTest extends TestCase
 
         $response = $this->actingAs($owner)->from(route('posts.edit', $post))->put(route('posts.update', $post), [
             'title' => '',
-            'topic' => 'Not a topic',
             'body' => str_repeat('a', 3001),
             'remove_media' => ['not-a-number'],
             'photos' => [UploadedFile::fake()->create('evil.php', 1, 'application/x-php')],
@@ -281,7 +281,7 @@ class PostEditTest extends TestCase
         ]);
 
         $response->assertRedirect(route('posts.edit', $post));
-        $response->assertSessionHasErrors(['title', 'topic', 'body', 'remove_media.0', 'photos.0']);
+        $response->assertSessionHasErrors(['title', 'body', 'remove_media.0', 'photos.0']);
         $response->assertSessionHasInput('body', str_repeat('a', 3001));
         $this->assertSame('Original title', $post->fresh()->title);
         $this->assertCount(2, $this->disk()->allFiles());

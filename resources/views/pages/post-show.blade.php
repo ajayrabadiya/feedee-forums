@@ -18,7 +18,9 @@
     <main id="main" class="container page">
         <ol class="crumbs light" aria-label="Breadcrumb">
             <li><a href="{{ route('home') }}">Feed</a></li>
-            <li>{{ $post->topic }}</li>
+            @if ($post->topic)
+                <li>{{ $post->topic }}</li>
+            @endif
             <li aria-current="page">{{ \Illuminate\Support\Str::limit($post->title, 40) }}</li>
         </ol>
 
@@ -31,7 +33,9 @@
                             <span class="author">{{ $post->user->name }}</span>
                             <span class="post-time"><time datetime="{{ $post->created_at->toIso8601String() }}">{{ $post->created_at->format('F j, Y \a\t g:i A') }}</time></span>
                         </div>
-                        <span class="topic">{{ $post->topic }}</span>
+                        @if ($post->topic)
+                            <span class="topic">{{ $post->topic }}</span>
+                        @endif
                         <div class="dropdown">
                             <button class="icon-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Post options"><i class="bi bi-three-dots"></i></button>
                             <ul class="dropdown-menu dropdown-menu-end">
@@ -225,7 +229,9 @@
                             <ul class="info-list">
                                 <li><span>Post ID</span><span>{{ $post->public_id }}</span></li>
                                 <li><span>Published</span><span>{{ $post->created_at->format('M j, Y') }}</span></li>
-                                <li><span>Topic</span><span>{{ $post->topic }}</span></li>
+                                @if ($post->topic)
+                                    <li><span>Topic</span><span>{{ $post->topic }}</span></li>
+                                @endif
                                 <li><span>Deleted on</span><span>{{ $post->expiresAt()->format('M j, Y') }}</span></li>
                             </ul>
                         </div>

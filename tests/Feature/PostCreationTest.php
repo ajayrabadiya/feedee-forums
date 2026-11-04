@@ -18,7 +18,6 @@ class PostCreationTest extends TestCase
     {
         return [
             'title' => 'My favourite cinnamon roll recipe',
-            'topic' => 'Recipes',
             'body' => 'Soft, gooey and easy to make.',
             'agree' => '1',
             ...$overrides,
@@ -55,6 +54,8 @@ class PostCreationTest extends TestCase
         $response->assertOk();
         $response->assertSee('Create a post');
         $response->assertSee('action="'.route('posts.store').'"', false);
+        $response->assertDontSee('name="topic"', false);
+        $response->assertDontSee('Choose a topic');
         $response->assertDontSee('data-demo', false);
     }
 
@@ -74,7 +75,7 @@ class PostCreationTest extends TestCase
 
         $this->assertSame($customer->id, $post->user_id);
         $this->assertSame('My favourite cinnamon roll recipe', $post->title);
-        $this->assertSame('Recipes', $post->topic);
+        $this->assertNull($post->topic);
     }
 
     public function test_admin_can_create_a_post(): void
@@ -90,12 +91,20 @@ class PostCreationTest extends TestCase
     {
         $response = $this->actingAs(User::factory()->create())->post(route('posts.store'), [
             'title' => '',
-            'topic' => 'Not a real topic',
             'body' => str_repeat('a', 3001),
         ]);
 
-        $response->assertSessionHasErrors(['title', 'topic', 'body', 'agree']);
+        $response->assertSessionHasErrors(['title', 'body', 'agree']);
         $this->assertSame(0, Post::count());
+    }
+
+    public function test_submitted_topic_is_ignored(): void
+    {
+        $this->actingAs(User::factory()->create())->post(route('posts.store'), $this->validPayload([
+            'topic' => 'Recipes',
+        ]));
+
+        $this->assertNull(Post::sole()->topic);
     }
 
     public function test_dashboard_only_lists_the_users_own_posts(): void

@@ -6,7 +6,6 @@ use App\Models\Post;
 use App\Rules\NoUrls;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class StorePostRequest extends FormRequest
 {
@@ -30,7 +29,6 @@ class StorePostRequest extends FormRequest
 
         return [
             'title' => ['required', 'string', 'max:150', new NoUrls('Links aren\'t allowed in the title. Describe your post in words instead.')],
-            'topic' => ['required', 'string', Rule::in(Post::TOPICS)],
             'body' => ['nullable', 'string', 'max:3000'],
             'photos' => ['nullable', 'array', 'max:'.$images['max_files']],
             'photos.*' => [
@@ -42,8 +40,6 @@ class StorePostRequest extends FormRequest
                 'mimetypes:'.implode(',', $images['mime_types']),
                 'max:'.$images['max_kb'],
             ],
-            'alt_text' => ['nullable', 'array', 'max:'.$images['max_files']],
-            'alt_text.*' => ['nullable', 'string', 'max:150'],
             'videos' => ['nullable', 'array', 'max:'.$videos['max_files']],
             'videos.*' => [
                 'required',
@@ -65,7 +61,6 @@ class StorePostRequest extends FormRequest
         $videos = config('media.videos');
 
         return [
-            'topic.in' => 'Please choose one of the listed topics.',
             'agree.accepted' => 'Please confirm you have read the community rules and own or have permission to share this media.',
             'photos.max' => "You can attach up to {$images['max_files']} photos.",
             'photos.*.uploaded' => 'A photo could not be uploaded. It may be larger than the server allows.',
@@ -79,7 +74,6 @@ class StorePostRequest extends FormRequest
             'videos.*.extensions' => 'Videos must be '.$videos['label'].' files.',
             'videos.*.mimetypes' => 'Videos must be '.$videos['label'].' files.',
             'videos.*.max' => 'Each video must be '.self::formatKb($videos['max_kb']).' or smaller.',
-            'alt_text.*.max' => 'Photo descriptions can be up to 150 characters.',
         ];
     }
 
@@ -91,7 +85,6 @@ class StorePostRequest extends FormRequest
         return [
             'photos.*' => 'photo',
             'videos.*' => 'video',
-            'alt_text.*' => 'photo description',
         ];
     }
 

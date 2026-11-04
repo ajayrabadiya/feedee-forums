@@ -26,7 +26,9 @@
             <span class="author">{{ $post->user->name }}</span>
             <span class="post-time"><time datetime="{{ $postedAt->toIso8601String() }}">{{ $postedLabel }}</time></span>
         </div>
-        <a href="{{ route('home', ['topic' => $post->topic]) }}" class="topic {{ $post->topicColor() }}">{{ $post->topic }}</a>
+        @if ($post->topic)
+            <a href="{{ route('home', ['topic' => $post->topic]) }}" class="topic {{ $post->topicColor() }}">{{ $post->topic }}</a>
+        @endif
         <div class="dropdown">
             <button class="icon-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Post options"><i class="bi bi-three-dots"></i></button>
             <ul class="dropdown-menu dropdown-menu-end">
