@@ -74,7 +74,9 @@ class PostEditTest extends TestCase
         $response->assertSee('value="Original title"', false);
         $response->assertDontSee('name="topic"', false);
         $response->assertDontSee('Choose a topic');
-        $response->assertSee('Original body text.</textarea>', false);
+        $response->assertSee('data-post-editor', false);
+        $response->assertSee('Original body text', false);
+        $response->assertSee('<textarea id="body" name="body" hidden>Original body text.</textarea>', false);
         $response->assertSee($this->disk()->url($image->file_path), false);
         $response->assertSee($this->disk()->url($video->file_path), false);
         $response->assertSee('name="remove_media[]" value="'.$image->id.'"', false);

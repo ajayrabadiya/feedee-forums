@@ -44,7 +44,7 @@
     <h2 class="post-title"><a href="{{ $postUrl }}">{{ $post->title }}</a></h2>
 
     @if (filled($post->body))
-        <p class="post-text">{{ \Illuminate\Support\Str::limit($post->body, 220) }}</p>
+        <p class="post-text">{{ $post->bodyExcerpt(220) }}</p>
     @endif
 
     @if ($shownImages->isNotEmpty())

@@ -296,4 +296,73 @@ class Post extends Model
     {
         return $this->created_at->copy()->addDays(self::LIFETIME_DAYS);
     }
+
+    /**
+     * Allowed HTML tags for rich post bodies.
+     */
+    public const BODY_ALLOWED_TAGS = '<p><br><strong><b><em><i><u><ul><ol><li><blockquote>';
+
+    /**
+     * Maximum plain-text length for the optional post body.
+     */
+    public const BODY_MAX_LENGTH = 3000;
+
+    public static function plainBody(?string $body): string
+    {
+        if ($body === null || trim($body) === '') {
+            return '';
+        }
+
+        return trim(html_entity_decode(strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $body)), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+    }
+
+    public static function sanitizeBody(?string $body): ?string
+    {
+        if ($body === null) {
+            return null;
+        }
+
+        $clean = trim(strip_tags($body, self::BODY_ALLOWED_TAGS));
+        $plain = self::plainBody($clean);
+
+        return $plain === '' ? null : $clean;
+    }
+
+    /**
+     * HTML safe to load into the create/edit rich text editor.
+     */
+    public static function bodyForEditor(?string $body): string
+    {
+        $clean = self::sanitizeBody($body);
+
+        if ($clean === null) {
+            return '';
+        }
+
+        if (preg_match('/<(?:p|br|strong|b|em|i|u|ul|ol|li|blockquote)\b/i', $clean) === 1) {
+            return $clean;
+        }
+
+        $paragraphs = preg_split('/\R{2,}/', trim($clean)) ?: [];
+
+        return collect($paragraphs)
+            ->map(fn (string $paragraph): string => '<p>'.nl2br(e($paragraph)).'</p>')
+            ->implode('');
+    }
+
+    /**
+     * HTML safe to render on the post page.
+     */
+    public function bodyHtml(): string
+    {
+        return self::bodyForEditor($this->body);
+    }
+
+    /**
+     * Plain-text excerpt for cards and meta descriptions.
+     */
+    public function bodyExcerpt(int $limit = 220): string
+    {
+        return Str::limit(self::plainBody($this->body), $limit);
+    }
 }

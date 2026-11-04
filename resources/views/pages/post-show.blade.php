@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', $post->title.' - Feedee Forums')
-@section('description', \Illuminate\Support\Str::limit($post->body ?: $post->title, 155))
+@section('description', $post->bodyExcerpt(155) ?: $post->title)
 
 @push('meta')
     <link rel="canonical" href="{{ route('posts.show', $post) }}">
@@ -85,11 +85,7 @@
                     </div>
 
                     @if (filled($post->body))
-                        <div class="post-body">
-                            @foreach (preg_split('/\R{2,}/', trim($post->body)) as $paragraph)
-                                <p>{!! nl2br(e($paragraph)) !!}</p>
-                            @endforeach
-                        </div>
+                        <div class="post-body">{!! $post->bodyHtml() !!}</div>
                     @endif
 
                     @if ($images->isNotEmpty())
