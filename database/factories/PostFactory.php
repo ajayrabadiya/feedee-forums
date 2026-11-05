@@ -24,6 +24,8 @@ class PostFactory extends Factory
             'title' => fake()->sentence(6),
             'topic' => fake()->randomElement(Post::TOPICS),
             'body' => fake()->paragraphs(2, true),
+            'status' => PostStatus::Approved,
+            'approved_at' => now(),
         ];
     }
 
@@ -32,7 +34,10 @@ class PostFactory extends Factory
      */
     public function pending(): static
     {
-        return $this->state(fn (array $attributes) => ['status' => PostStatus::Pending]);
+        return $this->state(fn (array $attributes) => [
+            'status' => PostStatus::Pending,
+            'approved_at' => null,
+        ]);
     }
 
     /**
@@ -43,6 +48,7 @@ class PostFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => PostStatus::Rejected,
             'rejection_reason' => $reason,
+            'approved_at' => null,
         ]);
     }
 
@@ -53,8 +59,22 @@ class PostFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => PostStatus::Approved,
+            'approved_at' => $attributes['approved_at'] ?? now(),
             'is_featured' => true,
             'featured_at' => now(),
+        ]);
+    }
+
+    /**
+     * Approved post whose 30-day lifetime has ended.
+     */
+    public function expired(?\DateTimeInterface $approvedAt = null): static
+    {
+        $approvedAt ??= now()->subDays(Post::LIFETIME_DAYS)->subMinute();
+
+        return $this->state(fn (array $attributes) => [
+            'status' => PostStatus::Approved,
+            'approved_at' => $approvedAt,
         ]);
     }
 }

@@ -79,7 +79,7 @@ class SitemapTest extends TestCase
     {
         $pending = Post::factory()->pending()->create();
         $rejected = Post::factory()->rejected('Off topic')->create();
-        $expired = Post::factory()->create(['created_at' => now()->subDays(Post::LIFETIME_DAYS + 1)]);
+        $expired = Post::factory()->expired(now()->subDays(Post::LIFETIME_DAYS + 1))->create();
 
         $content = $this->get('/sitemap.xml')->getContent();
 

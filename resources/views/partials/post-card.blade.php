@@ -5,7 +5,7 @@
     $shownImages = $images->take(3);
     $hiddenImages = $images->count() - $shownImages->count();
     $postedAt = $post->created_at;
-    $daysLeft = max(0, (int) ceil(now()->diffInDays($post->expiresAt(), false)));
+    $daysLeft = $post->expiresAt() ? max(0, (int) ceil(now()->diffInDays($post->expiresAt(), false))) : null;
 
     if ($postedAt->isToday()) {
         $postedLabel = $postedAt->diffForHumans();
@@ -79,7 +79,9 @@
         @endif
         @include('partials.like-button', ['post' => $post, 'size' => 'sm'])
         <a href="{{ $postUrl }}#comments" class="foot-comments"><i class="bi bi-chat"></i>{{ trans_choice('{0} No comments|{1} 1 comment|[2,*] :count comments', $post->comments_count ?? 0) }}</a>
-        <span><i class="bi bi-hourglass-split"></i>{{ trans_choice('{0} Expires today|{1} 1 day left|[2,*] :count days left', $daysLeft) }}</span>
+        @if ($daysLeft !== null)
+            <span><i class="bi bi-hourglass-split"></i>{{ trans_choice('{0} Expires today|{1} 1 day left|[2,*] :count days left', $daysLeft) }}</span>
+        @endif
         <a href="{{ $postUrl }}" class="read-more">View post <i class="bi bi-arrow-right"></i></a>
     </footer>
 </article>

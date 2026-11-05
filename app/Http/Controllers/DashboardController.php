@@ -19,7 +19,7 @@ class DashboardController extends Controller
             'user' => $user,
             'recentPosts' => $user->posts()->with('media')->latest()->take(10)->get(),
             'postCount' => $user->posts()->count(),
-            'livePostCount' => $user->posts()->where('created_at', '>=', now()->subDays(Post::LIFETIME_DAYS))->count(),
+            'livePostCount' => $user->posts()->published()->count(),
         ]);
     }
 }

@@ -121,7 +121,7 @@
 
                 <section class="panel-card prose" id="deletion">
                     <h2>30-day automatic deletion</h2>
-                    <p>Feedee Forums is designed for the moment, not forever. Every post is automatically and permanently deleted 30 days after it's published.</p>
+                    <p>Feedee Forums is designed for the moment, not forever. Every post is automatically and permanently deleted 30 days after it is approved.</p>
                     <ul>
                         <li>The post text, every photo, every video and all generated thumbnails are removed from our servers.</li>
                         <li>Deleted posts cannot be restored, by you or by our team.</li>

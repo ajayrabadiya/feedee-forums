@@ -162,7 +162,7 @@
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2" aria-expanded="false" aria-controls="faq2">Can I keep my post longer than 30 days?</button>
                     </h3>
                     <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqList">
-                        <div class="accordion-body">No. All posts, photos and videos are permanently deleted 30 days after publishing. That's part of what makes Feedee Forums feel light and in the moment. Save anything you'd like to keep before it expires.</div>
+                        <div class="accordion-body">No. All posts, photos and videos are permanently deleted 30 days after approval. That's part of what makes Feedee Forums feel light and in the moment. Save anything you'd like to keep before it expires.</div>
                     </div>
                 </div>
                 <div class="accordion-item">

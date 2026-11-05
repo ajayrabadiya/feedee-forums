@@ -25,8 +25,9 @@
 
             <div class="side-foot">
                 <div class="cron-mini">
-                    <strong><span class="dot-live"></span>Scheduler running</strong>
-                    Last cleanup today at 03:00<br>Next run in 3h 42m
+                    <strong>Daily post purge</strong>
+                    Approved posts are permanently deleted 30 days after approval.<br>
+                    Scheduled command: <code>posts:purge-expired</code> at 03:00
                 </div>
             </div>
         </aside>

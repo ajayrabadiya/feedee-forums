@@ -12,7 +12,7 @@
                         <ol class="lifecycle">
                             <li><span class="step-icon"><i class="bi bi-upload"></i></span><div><strong>You share</strong><span>Photos, a short video or a story</span></div></li>
                             <li><span class="step-icon"><i class="bi bi-shield-check"></i></span><div><strong>We keep it friendly</strong><span>Moderators look after the community</span></div></li>
-                            <li><span class="step-icon"><i class="bi bi-broadcast"></i></span><div><strong>Live for 30 days</strong><span>Visible to the whole community</span></div></li>
+                            <li><span class="step-icon"><i class="bi bi-broadcast"></i></span><div><strong>Live for 30 days</strong><span>After approval, then permanently deleted</span></div></li>
                             <li><span class="step-icon"><i class="bi bi-trash3"></i></span><div><strong>Gone for good</strong><span>Post and media permanently deleted</span></div></li>
                         </ol>
                         <a href="{{ route('rules') }}#deletion" class="how-panel-link">Read about the 30-day policy<i class="bi bi-arrow-right"></i></a>

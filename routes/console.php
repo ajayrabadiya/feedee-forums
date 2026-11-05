@@ -10,4 +10,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('app:import-geoip')->monthlyOn(7, '03:30')->withoutOverlapping();
-Schedule::command('model:prune', ['--model' => [SupportClick::class]])->dailyAt('03:00');
+Schedule::command('model:prune', ['--model' => [SupportClick::class]])->dailyAt('03:00')->withoutOverlapping();
+Schedule::command('posts:purge-expired')
+    ->dailyAt('03:00')
+    ->withoutOverlapping();

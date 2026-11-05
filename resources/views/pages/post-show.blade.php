@@ -228,7 +228,9 @@
                                 @if ($post->topic)
                                     <li><span>Topic</span><span>{{ $post->topic }}</span></li>
                                 @endif
-                                <li><span>Deleted on</span><span>{{ $post->expiresAt()->format('M j, Y') }}</span></li>
+                                @if ($post->expiresAt())
+                                    <li><span>Deleted on</span><span>{{ $post->expiresAt()->format('M j, Y') }}</span></li>
+                                @endif
                             </ul>
                         </div>
                     </div>

@@ -87,6 +87,11 @@ class PostController extends Controller
                 $post->status = Setting::requiresPostApproval() && ! $request->user()->isAdmin()
                     ? PostStatus::Pending
                     : PostStatus::Approved;
+
+                if ($post->status === PostStatus::Approved) {
+                    $post->markApprovedAtCreation();
+                }
+
                 $post->save();
 
                 $this->attachUploads($request, $post, $disk, $storedPaths);

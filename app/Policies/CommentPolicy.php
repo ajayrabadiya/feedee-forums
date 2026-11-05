@@ -9,11 +9,11 @@ use App\Models\User;
 class CommentPolicy
 {
     /**
-     * Members can comment on approved posts only.
+     * Members can comment on approved posts that are still within their lifetime.
      */
     public function create(User $user, Post $post): bool
     {
-        return $post->isApproved();
+        return $post->isWithinLifetime();
     }
 
     /**

@@ -8,13 +8,14 @@ use App\Models\User;
 class PostPolicy
 {
     /**
-     * Approved posts are public; pending and rejected posts are only visible
-     * to their author and administrators.
+     * Approved posts within their 30-day lifetime are public.
+     * Expired approved posts are hidden from everyone (including direct URLs).
+     * Pending and rejected posts are only visible to their author and administrators.
      */
     public function view(?User $user, Post $post): bool
     {
         if ($post->isApproved()) {
-            return true;
+            return $post->isWithinLifetime();
         }
 
         return $user !== null && ($user->isAdmin() || $post->user_id === $user->id);
@@ -45,11 +46,11 @@ class PostPolicy
     }
 
     /**
-     * Members can like approved posts.
+     * Members can like approved posts that are still within their lifetime.
      */
     public function like(User $user, Post $post): bool
     {
-        return $post->isApproved();
+        return $post->isWithinLifetime();
     }
 
     /**
