@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Feedee Forums — Admin Panel User Guide</title>
+<style>
+  @page {
+    size: A4;
+    margin: 18mm 16mm 20mm 16mm;
+    @bottom-center {
+      content: "Feedee Forums Admin Panel User Guide  ·  Page " counter(page);
+      font-size: 9px;
+      color: #777;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+  }
+  :root {
+    --primary: #ff5722;
+    --dark: #131313;
+    --text: #2a2825;
+    --muted: #6b6760;
+    --line: #e6e2db;
+    --bg: #f7f4ef;
+    --card: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    color: var(--text);
+    font: 11pt/1.55 "Segoe UI", Arial, Helvetica, sans-serif;
+    background: #fff;
+  }
+  h1, h2, h3, h4 {
+    color: var(--dark);
+    line-height: 1.25;
+    page-break-after: avoid;
+  }
+  h1 { font-size: 26pt; margin: 0 0 10px; }
+  h2 {
+    font-size: 16pt;
+    margin: 0 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 3px solid var(--primary);
+  }
+  h3 { font-size: 12.5pt; margin: 18px 0 8px; color: #3a3732; }
+  p, li { font-size: 10.5pt; }
+  p { margin: 0 0 10px; }
+  ul, ol { margin: 0 0 12px; padding-left: 1.3em; }
+  li { margin-bottom: 5px; }
+  a { color: var(--primary); text-decoration: none; }
+  .muted { color: var(--muted); }
+  .page { page-break-after: always; }
+  .page:last-child { page-break-after: auto; }
+  .cover {
+    min-height: 250mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 28mm 8mm 18mm;
+    background:
+      linear-gradient(160deg, #1a1a1a 0%, #2b2b2b 55%, #3a241c 100%);
+    color: #fff;
+    border-radius: 0;
+  }
+  .cover-brand { text-align: center; }
+  .cover-brand img {
+    width: 210px;
+    height: auto;
+    margin-bottom: 28px;
+    filter: brightness(1.05);
+  }
+  .cover .eyebrow {
+    display: inline-block;
+    padding: 6px 14px;
+    border: 1px solid rgba(255,87,34,.7);
+    border-radius: 999px;
+    color: #ffb39a;
+    font-size: 10pt;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .cover h1 {
+    color: #fff;
+    font-size: 30pt;
+    margin-bottom: 12px;
+  }
+  .cover .lead {
+    max-width: 420px;
+    margin: 0 auto 24px;
+    color: #d7d2cb;
+    font-size: 12pt;
+  }
+  .cover .url {
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 12pt;
+  }
+  .cover-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    border-top: 1px solid rgba(255,255,255,.15);
+    padding-top: 16px;
+    color: #bdb7ae;
+    font-size: 9.5pt;
+  }
+  .toc-list { list-style: none; padding: 0; margin: 0; }
+  .toc-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px dotted var(--line);
+  }
+  .toc-list span:last-child { color: var(--muted); white-space: nowrap; }
+  .callout {
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
+    margin: 14px 0;
+    border-radius: 10px;
+    background: #fff4ef;
+    border: 1px solid #ffd3c4;
+    page-break-inside: avoid;
+  }
+  .callout.warn {
+    background: #fff8e8;
+    border-color: #f0d59a;
+  }
+  .callout.danger {
+    background: #fff1f1;
+    border-color: #f0bdbd;
+  }
+  .callout strong { display: block; margin-bottom: 2px; }
+  .callout p { margin: 0; font-size: 10pt; }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #fff0ea;
+    color: var(--primary);
+    font-size: 9pt;
+    font-weight: 600;
+  }
+  .shot {
+    margin: 14px 0 8px;
+    page-break-inside: avoid;
+  }
+  .shot img {
+    display: block;
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.06);
+  }
+  .shot figcaption {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 9pt;
+    font-style: italic;
+  }
+  .steps {
+    counter-reset: step;
+    list-style: none;
+    padding: 0;
+  }
+  .steps > li {
+    position: relative;
+    padding-left: 34px;
+    margin-bottom: 10px;
+  }
+  .steps > li::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    font-size: 10pt;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 22px;
+    text-align: center;
+  }
+  table.matrix {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 16px;
+    font-size: 10pt;
+  }
+  table.matrix th, table.matrix td {
+    border: 1px solid var(--line);
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  table.matrix th {
+    background: #f3f0ea;
+    color: var(--dark);
+  }
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .card {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    background: var(--bg);
+    page-break-inside: avoid;
+  }
+  .card h4 { margin: 0 0 6px; font-size: 11pt; }
+  .footer-note {
+    margin-top: 24px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 9pt;
+  }
+  .section-kicker {
+    color: var(--primary);
+    font-size: 9.5pt;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<section class="page cover">
+  <div class="cover-brand">
+    <img src="screenshots/logo.png" alt="Feedee Forums">
+    <div class="eyebrow">Official Documentation</div>
+    <h1>Admin Panel<br>User Guide</h1>
+    <p class="lead">A practical manual for administrators who manage content, members, messages, settings, and support activity on Feedee Forums.</p>
+    <div class="url">https://feedeeforums.com/</div>
+  </div>
+  <div class="cover-meta">
+    <div>
+      <strong style="color:#fff;">Document</strong><br>
+      Feedee Forums Admin Panel User Guide
+    </div>
+    <div>
+      <strong style="color:#fff;">Audience</strong><br>
+      Site administrators / client operators
+    </div>
+    <div>
+      <strong style="color:#fff;">Version</strong><br>
+      1.0 · November 2026
+    </div>
+  </div>
+</section>
+
+<!-- TOC -->
+<section class="page">
+  <div class="section-kicker">Contents</div>
+  <h2>Table of contents</h2>
+  <ol class="toc-list">
+    <li><span>1. Introduction</span><span>3</span></li>
+    <li><span>2. Admin login</span><span>4</span></li>
+    <li><span>3. Dashboard</span><span>5</span></li>
+    <li><span>4. Customer management</span><span>7</span></li>
+    <li><span>5. Post management</span><span>8</span></li>
+    <li><span>6. Contact messages</span><span>10</span></li>
+    <li><span>7. Website settings</span><span>11</span></li>
+    <li><span>8. Support button &amp; analytics</span><span>13</span></li>
+    <li><span>9. Other admin features</span><span>15</span></li>
+    <li><span>10. Security best practices</span><span>16</span></li>
+    <li><span>11. Troubleshooting &amp; FAQ</span><span>17</span></li>
+    <li><span>Appendix A — Feature summary</span><span>18</span></li>
+    <li><span>Appendix B — Unavailable / incomplete features</span><span>19</span></li>
+  </ol>
+  <div class="callout">
+    <div>
+      <strong>About this guide</strong>
+      <p>This guide documents only features that exist in the current Feedee Forums Laravel application. Screenshots were captured from the live admin interface. Personal emails and names in screenshots have been masked where practical.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 1 INTRO -->
+<section class="page">
+  <div class="section-kicker">Section 1</div>
+  <h2>Introduction</h2>
+  <p>The Feedee Forums admin panel is the control centre for running the community website at <strong>https://feedeeforums.com/</strong>. Administrators use it to moderate posts, review member activity, respond to contact enquiries, configure the public Support button, monitor support-link clicks, and manage email delivery settings.</p>
+
+  <h3>Purpose of the admin panel</h3>
+  <ul>
+    <li>Keep the public feed safe, friendly, and on-topic.</li>
+    <li>Approve, reject, feature, or permanently delete posts and their media.</li>
+    <li>Monitor registered customers and their posting activity.</li>
+    <li>Read and manage messages submitted through the contact form.</li>
+    <li>Control Support payment links and review click analytics.</li>
+    <li>Configure outbound email used for rejection notices and contact alerts.</li>
+  </ul>
+
+  <h3>How administrators manage the website</h3>
+  <p>Only accounts with the <strong>admin</strong> role can open <code>/admin</code>. After login, admins are redirected to the admin dashboard. The dark sidebar provides navigation between all working admin sections. Changes made in Posts, Settings, and Contacts affect the live public website immediately.</p>
+
+  <h3>Overview of available features</h3>
+  <table class="matrix">
+    <thead>
+      <tr><th>Section</th><th>What you can do</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Dashboard</td><td>View pending posts, unread messages, approvals, member counts, weekly chart, and support overview</td></tr>
+      <tr><td>Support analytics</td><td>Analyse Support-button payment-link clicks by period, country, platform, and page</td></tr>
+      <tr><td>Posts</td><td>Moderate posts; toggle required approval; approve / reject / feature / delete</td></tr>
+      <tr><td>Customers</td><td>Browse registered members, filter activity, open their posts, email them</td></tr>
+      <tr><td>Contact messages</td><td>Read, mark unread, reply by email, delete enquiries</td></tr>
+      <tr><td>Settings</td><td>Configure Support button links and SMTP / email settings</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 2 LOGIN -->
+<section class="page">
+  <div class="section-kicker">Section 2</div>
+  <h2>Admin login</h2>
+
+  <h3>How to access the admin panel</h3>
+  <ol class="steps">
+    <li>Open the website login page: <strong>https://feedeeforums.com/login</strong></li>
+    <li>Sign in with an administrator account (email or username + password).</li>
+    <li>After a successful login, admin users are taken to <strong>/admin</strong> (the Dashboard).</li>
+    <li>You can also visit <strong>https://feedeeforums.com/admin</strong> directly. Guests are redirected to login first.</li>
+  </ol>
+
+  <figure class="shot">
+    <img src="screenshots/01-login.png" alt="Feedee Forums login page">
+    <figcaption>Figure 1 — Public login page used by administrators and members.</figcaption>
+  </figure>
+
+  <h3>How to log in</h3>
+  <ol class="steps">
+    <li>Enter your admin <strong>email or username</strong>.</li>
+    <li>Enter your <strong>password</strong>.</li>
+    <li>Optionally tick <strong>Keep me logged in</strong> on a private device only.</li>
+    <li>Click <strong>Log in</strong>.</li>
+  </ol>
+
+  <h3>Login security recommendations</h3>
+  <ul>
+    <li>Use a unique, strong password for the admin account.</li>
+    <li>Do not use “Keep me logged in” on shared or public computers.</li>
+    <li>Never share admin credentials in chat, email, or screenshots.</li>
+    <li>If you forget the password, use <strong>Forgot password?</strong> on the login page.</li>
+  </ul>
+
+  <h3>How to log out safely</h3>
+  <ol class="steps">
+    <li>In the admin top-right corner, open the administrator menu.</li>
+    <li>Choose <strong>Log out</strong>.</li>
+    <li>You are returned to the public site and the session ends.</li>
+  </ol>
+
+  <figure class="shot">
+    <img src="screenshots/10-admin-menu.png" alt="Administrator menu with Log out">
+    <figcaption>Figure 2 — Administrator menu: View site, Profile, and Log out.</figcaption>
+  </figure>
+</section>
+
+<!-- 3 DASHBOARD -->
+<section class="page">
+  <div class="section-kicker">Section 3</div>
+  <h2>Dashboard</h2>
+  <p>The Dashboard is the home screen of the admin panel. It summarises moderation workload, membership, and recent support activity so you can decide what needs attention first.</p>
+
+  <figure class="shot">
+    <img src="screenshots/02-dashboard-top.png" alt="Admin dashboard overview">
+    <figcaption>Figure 3 — Dashboard overview with sidebar navigation and summary cards.</figcaption>
+  </figure>
+
+  <h3>Statistics and summary cards</h3>
+  <table class="matrix">
+    <thead><tr><th>Card</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>Posts awaiting review</td><td>Number of posts currently in <em>Pending</em> status. Clicking opens Posts.</td></tr>
+      <tr><td>Unread contact messages</td><td>Contact form messages not yet opened. Clicking opens Contact messages.</td></tr>
+      <tr><td>Approved today</td><td>Posts approved today, compared with yesterday.</td></tr>
+      <tr><td>Registered members</td><td>Customer accounts, with new sign-ups in the last 7 days.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Understanding dashboard information</h3>
+  <ul>
+    <li><strong>Posts this week</strong> — bar chart of submitted vs approved posts for the last 7 days.</li>
+    <li><strong>Waiting for review</strong> — oldest pending posts, with quick moderation actions and a link to the full queue.</li>
+    <li><strong>Latest contact messages</strong> — newest enquiries with a link to the full inbox.</li>
+    <li><strong>Support analytics strip</strong> — recent Support-button activity with a link to the full Support analytics report.</li>
+    <li>The sidebar footer shows whether the Laravel scheduler appears to be running (important for 30-day post cleanup).</li>
+  </ul>
+
+  <h3>How to navigate the admin panel</h3>
+  <div class="two-col">
+    <div class="card">
+      <h4>Sidebar</h4>
+      <p>Use Overview, Moderation, Community, and System groups to open Dashboard, Support analytics, Posts, Customers, Contact messages, and Settings.</p>
+    </div>
+    <div class="card">
+      <h4>Top bar</h4>
+      <p>Shows the current page title, date or short description, and your administrator menu (View site / Profile / Log out).</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4 CUSTOMERS -->
+<section class="page">
+  <div class="section-kicker">Section 4</div>
+  <h2>Customer management</h2>
+  <p>Customers are registered member accounts (non-admin users) who can create posts on the public site.</p>
+
+  <figure class="shot">
+    <img src="screenshots/03-customers.png" alt="Customers page">
+    <figcaption>Figure 4 — Customers list with activity stats and filters.</figcaption>
+  </figure>
+
+  <h3>View registered customers</h3>
+  <p>Open <strong>Customers</strong> in the sidebar. Summary cards show total registered customers, joins in the last 7 days, members who posted in the last 30 days, and customer posts awaiting review.</p>
+
+  <h3>Search and filter customers</h3>
+  <ul>
+    <li><strong>Tabs:</strong> All · Posted recently · Not posting</li>
+    <li><strong>Search:</strong> filter by name, username, or email</li>
+    <li><strong>Show:</strong> choose 10 / 25 / 50 rows per page</li>
+  </ul>
+
+  <h3>View customer details</h3>
+  <p>Each row shows the display name, username, email, join date, post counts (approved / pending / rejected), and last post time.</p>
+
+  <h3>Available customer actions</h3>
+  <table class="matrix">
+    <thead><tr><th>Action</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td>View posts (document icon)</td><td>Opens the Posts page filtered to that customer’s name. Disabled when the customer has no posts.</td></tr>
+      <tr><td>Email customer (envelope icon)</td><td>Opens your email client with a mailto link to the customer.</td></tr>
+    </tbody>
+  </table>
+  <div class="callout warn">
+    <div>
+      <strong>Note</strong>
+      <p>The current Customers page does not include edit, suspend, delete-account, or password-reset actions for members. Account changes are limited to viewing activity and contacting the member by email.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 POSTS -->
+<section class="page">
+  <div class="section-kicker">Section 5</div>
+  <h2>Post management</h2>
+  <p>Posts is the main moderation workspace. Use it to review submissions, publish or reject content, feature posts, and permanently remove posts with their media.</p>
+
+  <figure class="shot">
+    <img src="screenshots/04-posts.png" alt="Posts moderation page">
+    <figcaption>Figure 5 — Posts page with approval switch, status tabs, and moderation actions.</figcaption>
+  </figure>
+
+  <h3>Require approval for new posts</h3>
+  <ul>
+    <li><strong>Off:</strong> new posts appear in the public feed immediately. You can still reject, feature, or delete them later.</li>
+    <li><strong>On:</strong> new posts start as <span class="badge">Pending</span> and stay hidden until approved.</li>
+  </ul>
+
+  <h3>Understand moderation status</h3>
+  <table class="matrix">
+    <thead><tr><th>Status / tab</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>Pending</td><td>Waiting for admin review</td></tr>
+      <tr><td>Approved</td><td>Live in the public feed</td></tr>
+      <tr><td>Featured</td><td>Pinned in the Featured area above the chronological feed</td></tr>
+      <tr><td>Rejected</td><td>Not shown publicly; author is emailed the reason</td></tr>
+      <tr><td>All</td><td>Every post regardless of status</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Approve, reject, feature, or delete</h3>
+  <ol class="steps">
+    <li>Open <strong>Posts</strong> and choose the relevant tab (for example Pending).</li>
+    <li>Optionally search by title, author, or topic, or filter by topic.</li>
+    <li>Use the row action buttons:
+      <ul>
+        <li><strong>Approve (✓)</strong> — publish to the feed and start the 30-day lifetime.</li>
+        <li><strong>Reject (✕)</strong> — choose a reason (and optional note); the author is emailed.</li>
+        <li><strong>Feature (★)</strong> — pin at the top of the feed (also approves if pending).</li>
+        <li><strong>Delete (trash)</strong> — permanently remove the post and all media after confirmation.</li>
+      </ul>
+    </li>
+    <li>For bulk work, tick several posts and use the bulk bar: Approve, Feature, Reject, Delete.</li>
+  </ol>
+
+  <h3>Image and video management</h3>
+  <ul>
+    <li>Each post row shows media counts (photos / videos) and a thumbnail when photos exist.</li>
+    <li>Click the post title to open the public post preview in a new tab and review every photo/video before approving.</li>
+    <li>Deleting a post removes original files and generated thumbnails from storage. This cannot be undone.</li>
+  </ul>
+
+  <h3>30-day automatic removal</h3>
+  <p>Approved posts expire <strong>30 days</strong> after they go live. The Posts table shows remaining days under <em>Expires in</em>. Cleanup is performed by the Laravel scheduler. The Dashboard sidebar indicates scheduler status. On Hostinger, a cron entry should run <code>php artisan schedule:run</code> every minute.</p>
+</section>
+
+<!-- 6 CONTACTS -->
+<section class="page">
+  <div class="section-kicker">Section 6</div>
+  <h2>Contact messages</h2>
+  <p>Messages submitted through the public contact form appear here for administrators to read and handle.</p>
+
+  <figure class="shot">
+    <img src="screenshots/05-contacts.png" alt="Contact messages inbox">
+    <figcaption>Figure 6 — Contact messages inbox with unread / read filters.</figcaption>
+  </figure>
+
+  <h3>View and filter messages</h3>
+  <ul>
+    <li>Tabs: <strong>Unread</strong>, <strong>Read</strong>, <strong>All</strong></li>
+    <li>Search by name, email, or message text</li>
+    <li>Filter by subject</li>
+  </ul>
+
+  <h3>Read message details</h3>
+  <ol class="steps">
+    <li>Click a message row or the open-envelope action.</li>
+    <li>Opening a message marks it as read automatically.</li>
+    <li>The detail page shows the full message plus sender details, linked account (if any), optional post reference, received time, and IP address.</li>
+  </ol>
+
+  <figure class="shot">
+    <img src="screenshots/06-contact-detail.png" alt="Contact message detail">
+    <figcaption>Figure 7 — Contact message detail with reply, unread, and delete actions.</figcaption>
+  </figure>
+
+  <h3>Managing enquiries</h3>
+  <table class="matrix">
+    <thead><tr><th>Action</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>Reply by email</td><td>Opens your mail client addressed to the sender</td></tr>
+      <tr><td>Mark as unread</td><td>Returns the message to the unread queue</td></tr>
+      <tr><td>Delete</td><td>Permanently removes the message after confirmation</td></tr>
+    </tbody>
+  </table>
+  <p>Typical workflow: open new messages daily → reply from your email → leave as read for records, or delete when no longer needed.</p>
+</section>
+
+<!-- 7 SETTINGS -->
+<section class="page">
+  <div class="section-kicker">Section 7</div>
+  <h2>Website settings</h2>
+  <p>Settings controls the public Support button and the email system used for contact alerts and post-rejection notices.</p>
+
+  <figure class="shot">
+    <img src="screenshots/07-settings.png" alt="Settings page">
+    <figcaption>Figure 8 — Settings: Support button configuration and email sending.</figcaption>
+  </figure>
+
+  <h3>Support button settings</h3>
+  <table class="matrix">
+    <thead><tr><th>Setting</th><th>Effect on the public website</th></tr></thead>
+    <tbody>
+      <tr><td>Show the Support button</td><td>Turns the floating Support button on or off site-wide</td></tr>
+      <tr><td>YouPay link / caption</td><td>Payment option shown in the Support dial</td></tr>
+      <tr><td>Cash App link / caption</td><td>Second payment option in the Support dial</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>Leave a link empty to hide that option.</li>
+    <li>If both links are empty, the button is hidden automatically even when enabled.</li>
+    <li>Click <strong>Save support button</strong>, then use <em>Preview on the site</em> to verify.</li>
+  </ul>
+
+  <h3>Email sending settings</h3>
+  <ul>
+    <li><strong>Send emails using:</strong> Log only (writes to the server log) or SMTP server.</li>
+    <li><strong>Also send contact messages to:</strong> optional extra recipient. Every admin account is always emailed too.</li>
+    <li><strong>SMTP host / port / encryption / username / password:</strong> required when SMTP is selected. Password is stored encrypted; leave blank to keep the saved password.</li>
+    <li><strong>From email / From name:</strong> appear on outbound messages.</li>
+  </ul>
+
+  <div class="callout danger">
+    <div>
+      <strong>Precautions</strong>
+      <p>Incorrect SMTP settings can stop rejection emails and contact alerts. Always click <strong>Save email settings</strong>, then <strong>Send test</strong> to your own address before relying on production mail.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 8 SUPPORT -->
+<section class="page">
+  <div class="section-kicker">Section 8</div>
+  <h2>Support button &amp; analytics</h2>
+
+  <h3>Floating Support button</h3>
+  <p>When enabled in Settings, a floating <strong>Support</strong> button appears on public pages. Visitors can open YouPay or Cash App links from the dial. Admin clicks are not tracked the same way as visitor clicks.</p>
+
+  <figure class="shot">
+    <img src="screenshots/09-public-home-support.png" alt="Public site with Support button">
+    <figcaption>Figure 9 — Public website showing the floating Support button (bottom-right).</figcaption>
+  </figure>
+
+  <h3>Support interaction tracking</h3>
+  <p>The application records clicks on Support payment links. These are <strong>clicks, not payments</strong>. A click never proves that a donation was completed.</p>
+
+  <figure class="shot">
+    <img src="screenshots/08-support-analytics.png" alt="Support link analytics">
+    <figcaption>Figure 10 — Support link analytics with period filters and totals.</figcaption>
+  </figure>
+
+  <h3>Available analytics (currently implemented)</h3>
+  <ul>
+    <li>Reporting periods: Today, Last 7 days, Last 30 days, This month, Custom range</li>
+    <li>Totals: total support clicks, YouPay clicks, Cash App clicks, approximate unique visitors</li>
+    <li>Fixed period cards and “Not counted” filtered clicks</li>
+    <li>Country breakdown (requires GeoIP database import on the server)</li>
+    <li>Daily statistics and recent activity list</li>
+    <li>CSV export: Country report, Daily statistics, Every click</li>
+  </ul>
+
+  <h3>How administrators monitor support activity</h3>
+  <ol class="steps">
+    <li>Open <strong>Support analytics</strong> from the sidebar.</li>
+    <li>Choose a reporting period.</li>
+    <li>Review platform split, countries, and recent activity.</li>
+    <li>Use <strong>Export CSV</strong> when you need a spreadsheet for the client or accounting follow-up.</li>
+  </ol>
+</section>
+
+<!-- 9 OTHER -->
+<section class="page">
+  <div class="section-kicker">Section 9</div>
+  <h2>Other admin features</h2>
+
+  <h3>In-app admin guide</h3>
+  <p>An HTML admin guide is available at <strong>/admin/docs</strong>. It covers reviewing, featuring, deleting posts, reports guidance text, cleanup cron notes, and moderation tips. It is not linked in the sidebar in the current build, but the route is active for signed-in admins.</p>
+
+  <h3>Profile</h3>
+  <p>From the administrator menu, <strong>Profile</strong> opens the shared member profile editor where the logged-in admin can update account details and password.</p>
+
+  <h3>View site</h3>
+  <p><strong>View site</strong> opens the public feed so you can verify how moderated content appears to visitors.</p>
+
+  <h3>Scheduler / cleanup indicator</h3>
+  <p>The sidebar shows a scheduler status widget. Automatic 30-day post deletion depends on the server cron calling Laravel’s scheduler.</p>
+
+  <div class="callout warn">
+    <div>
+      <strong>Reports page status</strong>
+      <p>A <code>/admin/reports</code> view exists in the project, but it is presently a static mock-up with sample figures and is not wired to a working reports backend. Do not treat it as a live moderation tool. See Appendix B.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10 SECURITY -->
+<section class="page">
+  <div class="section-kicker">Section 10</div>
+  <h2>Security best practices</h2>
+  <ul>
+    <li><strong>Protect administrator credentials.</strong> Store them in a password manager. Never place them in shared documents or chat.</li>
+    <li><strong>Use strong passwords</strong> and change them if a device is lost or access may have leaked.</li>
+    <li><strong>Log out</strong> after finishing administrative work, especially on shared computers.</li>
+    <li><strong>Avoid sharing administrator access.</strong> Create separate admin accounts if multiple people need access.</li>
+    <li><strong>Be careful when deleting.</strong> Post deletion removes media forever. Contact message deletion cannot be undone.</li>
+    <li><strong>Treat contact IPs and emails as private.</strong> Do not publish reporter or sender details.</li>
+    <li><strong>Test email settings</strong> with a test send before rejecting posts in production.</li>
+  </ul>
+</section>
+
+<!-- 11 FAQ -->
+<section class="page">
+  <div class="section-kicker">Section 11</div>
+  <h2>Troubleshooting &amp; FAQ</h2>
+
+  <h3>I cannot log in to /admin</h3>
+  <ul>
+    <li>Confirm you are using an account with the admin role.</li>
+    <li>Try logging in at /login first, then open /admin.</li>
+    <li>Reset the password with Forgot password if needed.</li>
+  </ul>
+
+  <h3>Pending posts are not appearing in the feed</h3>
+  <p>If “Require approval for new posts” is on, approve them from Posts → Pending. If it is off, new posts should appear immediately unless rejected or deleted.</p>
+
+  <h3>Images or videos are missing</h3>
+  <ul>
+    <li>Open the post from the admin table to confirm the media still exists.</li>
+    <li>If the post was deleted or expired after 30 days, media is permanently removed.</li>
+    <li>Check that storage/public links are correctly configured on the server.</li>
+  </ul>
+
+  <h3>Contact messages are not arriving by email</h3>
+  <ul>
+    <li>Open Settings → Email sending and verify SMTP details.</li>
+    <li>Send a test email.</li>
+    <li>If the mailer is “Log only”, messages are written to the application log instead of being delivered.</li>
+    <li>You can still read every submission under Contact messages in the admin panel.</li>
+  </ul>
+
+  <h3>Dashboard numbers look unexpected</h3>
+  <p>Cards count live database records. “Approved today” includes auto-approved posts (when approval is off) based on creation/moderation time. Refresh the page after moderating.</p>
+
+  <h3>Support analytics countries show “Unknown”</h3>
+  <p>Country detection needs the GeoIP database. On the server, run the project’s GeoIP import command (documented in the Support analytics page notice) and ensure the scheduler can refresh it monthly.</p>
+
+  <div class="footer-note">
+    End of main guide. Appendices follow.
+  </div>
+</section>
+
+<!-- APPENDIX A -->
+<section class="page">
+  <div class="section-kicker">Appendix A</div>
+  <h2>Feature summary</h2>
+  <table class="matrix">
+    <thead><tr><th>Feature</th><th>Status</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Admin login / logout</td><td>Working</td><td>Role-gated /admin area</td></tr>
+      <tr><td>Dashboard stats &amp; chart</td><td>Working</td><td>Pending, messages, approvals, members</td></tr>
+      <tr><td>Post moderation</td><td>Working</td><td>Approve, reject, feature, delete, bulk actions</td></tr>
+      <tr><td>Post approval switch</td><td>Working</td><td>On Posts page</td></tr>
+      <tr><td>Customer list</td><td>Working</td><td>Search/filter; view posts; mailto</td></tr>
+      <tr><td>Contact inbox</td><td>Working</td><td>Read/unread, reply, delete</td></tr>
+      <tr><td>Support button settings</td><td>Working</td><td>YouPay + Cash App</td></tr>
+      <tr><td>Mail settings + test</td><td>Working</td><td>Log or SMTP</td></tr>
+      <tr><td>Support link analytics</td><td>Working</td><td>Ranges, platforms, CSV export</td></tr>
+      <tr><td>30-day auto deletion</td><td>Working</td><td>Requires server scheduler/cron</td></tr>
+      <tr><td>In-app /admin/docs guide</td><td>Working</td><td>Route exists; not in sidebar</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- APPENDIX B -->
+<section class="page">
+  <div class="section-kicker">Appendix B</div>
+  <h2>Unavailable or incomplete features</h2>
+  <p>These items were found during inspection but should <strong>not</strong> be treated as finished client-facing tools yet:</p>
+  <table class="matrix">
+    <thead><tr><th>Item</th><th>Why it is excluded / limited</th></tr></thead>
+    <tbody>
+      <tr><td>Admin Reports UI (<code>/admin/reports</code>)</td><td>Static mock page with hard-coded sample statistics; no working backend controller for real member reports.</td></tr>
+      <tr><td>Customer edit / ban / delete</td><td>Not implemented on the Customers page.</td></tr>
+      <tr><td>Assigning staff roles from UI</td><td>No admin UI to promote/demote users.</td></tr>
+      <tr><td>In-panel reply composer for contacts</td><td>Reply uses external mailto only.</td></tr>
+      <tr><td>Sidebar link to /admin/docs</td><td>Guide route works but is not listed in the current sidebar navigation.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <div>
+      <strong>Document control</strong>
+      <p>Prepared for client delivery for https://feedeeforums.com/. Based on the Laravel codebase and screenshots captured from the admin panel. Version 1.0 — November 2026.</p>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
