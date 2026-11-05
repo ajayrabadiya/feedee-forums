@@ -50,7 +50,11 @@ class Post extends Model
     ];
 
     /**
-     * Number of days a post stays live before it is permanently deleted.
+     * Number of days a post stays live after approval before it is permanently deleted.
+     *
+     * The lifetime starts at approved_at (when the post becomes Approved), not created_at.
+     * Re-approving a previously rejected post starts a new 30-day window.
+     * Editing an already-approved post does not change approved_at.
      */
     public const LIFETIME_DAYS = 30;
 
@@ -89,6 +93,7 @@ class Post extends Model
             'is_featured' => 'boolean',
             'featured_at' => 'datetime',
             'moderated_at' => 'datetime',
+            'approved_at' => 'datetime',
         ];
     }
 
@@ -184,13 +189,28 @@ class Post extends Model
     }
 
     /**
-     * Only posts still inside their 30-day lifetime.
+     * Approved posts still inside their approval-based 30-day lifetime.
+     *
+     * A post approved exactly LIFETIME_DAYS ago is no longer live (eligible for purge).
      *
      * @param  Builder<Post>  $query
      */
     public function scopeLive(Builder $query): void
     {
-        $query->where('created_at', '>=', now()->subDays(self::LIFETIME_DAYS));
+        $query->whereNotNull('approved_at')
+            ->where('approved_at', '>', now()->subDays(self::LIFETIME_DAYS));
+    }
+
+    /**
+     * Approved posts whose 30-day lifetime has ended (awaiting or eligible for purge).
+     *
+     * @param  Builder<Post>  $query
+     */
+    public function scopeExpired(Builder $query): void
+    {
+        $query->where('status', PostStatus::Approved)
+            ->whereNotNull('approved_at')
+            ->where('approved_at', '<=', now()->subDays(self::LIFETIME_DAYS));
     }
 
     /**
@@ -201,6 +221,26 @@ class Post extends Model
     public function scopePublished(Builder $query): void
     {
         $query->where('status', PostStatus::Approved)->live();
+    }
+
+    /**
+     * Whether this approved post has passed its approval-based expiry.
+     */
+    public function isExpired(): bool
+    {
+        return $this->isApproved()
+            && $this->approved_at !== null
+            && $this->approved_at->lte(now()->subDays(self::LIFETIME_DAYS));
+    }
+
+    /**
+     * Whether this post is approved and still within its public lifetime.
+     */
+    public function isWithinLifetime(): bool
+    {
+        return $this->isApproved()
+            && $this->approved_at !== null
+            && $this->approved_at->gt(now()->subDays(self::LIFETIME_DAYS));
     }
 
     public function isApproved(): bool
@@ -228,13 +268,28 @@ class Post extends Model
 
     public function approve(User $moderator): void
     {
+        $alreadyApproved = $this->isApproved() && $this->approved_at !== null;
+
         $this->forceFill([
             'status' => PostStatus::Approved,
             'rejection_reason' => null,
             'rejection_note' => null,
             'moderated_by' => $moderator->id,
             'moderated_at' => now(),
+            // Keep the original approval time when re-clicking approve on a live post.
+            // Re-approving after rejection starts a new 30-day window.
+            'approved_at' => $alreadyApproved ? $this->approved_at : now(),
         ])->save();
+    }
+
+    /**
+     * Mark the post as approved at creation time (auto-publish / admin author).
+     */
+    public function markApprovedAtCreation(): void
+    {
+        if ($this->approved_at === null) {
+            $this->approved_at = now();
+        }
     }
 
     public function reject(User $moderator, string $reason, ?string $note = null): void
@@ -290,11 +345,16 @@ class Post extends Model
     }
 
     /**
-     * Date the post is scheduled to be permanently deleted.
+     * Date the post is scheduled to be permanently deleted (approval + 30 days).
+     * Null until the post has been approved.
      */
-    public function expiresAt(): Carbon
+    public function expiresAt(): ?Carbon
     {
-        return $this->created_at->copy()->addDays(self::LIFETIME_DAYS);
+        if ($this->approved_at === null) {
+            return null;
+        }
+
+        return $this->approved_at->copy()->addDays(self::LIFETIME_DAYS);
     }
 
     /**

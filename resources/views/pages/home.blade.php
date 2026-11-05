@@ -61,7 +61,7 @@
                 <section class="welcome">
                     <span class="eyebrow"><i class="bi bi-stars"></i>Welcome to Feedee Forums</span>
                     <h1>Share your feedee moments, stuffed bellies, and belly stuffing stories.</h1>
-                    <p>Post photos, short videos, and stories with a welcoming community of feedees, gainers, and feeders. Every post stays live for 30 days.</p>
+                    <p>Post photos, short videos, and stories with a welcoming community of feedees, gainers, and feeders. Every post stays live for 30 days after approval.</p>
                     <div class="welcome-btns">
                         @auth
                             <a href="{{ route('posts.create') }}" class="btn-fill">Create a post</a>

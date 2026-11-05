@@ -67,7 +67,9 @@ class PostVisibilityTest extends TestCase
             'title' => 'Instant post', 'topic' => 'Recipes', 'agree' => '1',
         ])->assertSessionHas('status', 'Thanks for sharing! Your post has been published.');
 
-        $this->assertSame(PostStatus::Approved, Post::sole()->status);
+        $post = Post::sole();
+        $this->assertSame(PostStatus::Approved, $post->status);
+        $this->assertNotNull($post->approved_at);
     }
 
     public function test_new_customer_posts_wait_for_review_when_approval_is_on(): void
@@ -79,7 +81,9 @@ class PostVisibilityTest extends TestCase
             'title' => 'Needs review', 'topic' => 'Recipes', 'agree' => '1',
         ])->assertSessionHas('status', 'Thanks for sharing! Your post will appear in the feed once a moderator approves it.');
 
-        $this->assertSame(PostStatus::Pending, Post::sole()->status);
+        $post = Post::sole();
+        $this->assertSame(PostStatus::Pending, $post->status);
+        $this->assertNull($post->approved_at);
     }
 
     public function test_admin_posts_skip_the_review_queue(): void
@@ -90,7 +94,9 @@ class PostVisibilityTest extends TestCase
             'title' => 'Admin announcement', 'topic' => 'The Lounge', 'agree' => '1',
         ]);
 
-        $this->assertSame(PostStatus::Approved, Post::sole()->status);
+        $post = Post::sole();
+        $this->assertSame(PostStatus::Approved, $post->status);
+        $this->assertNotNull($post->approved_at);
     }
 
     public function test_feed_only_shows_approved_posts(): void

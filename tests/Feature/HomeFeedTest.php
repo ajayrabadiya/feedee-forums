@@ -48,8 +48,8 @@ class HomeFeedTest extends TestCase
 
     public function test_expired_posts_are_hidden(): void
     {
-        Post::factory()->create(['title' => 'Still live post', 'created_at' => now()->subDays(29)]);
-        Post::factory()->create(['title' => 'Expired old post', 'created_at' => now()->subDays(31)]);
+        Post::factory()->create(['title' => 'Still live post', 'approved_at' => now()->subDays(29)]);
+        Post::factory()->expired(now()->subDays(31))->create(['title' => 'Expired old post']);
 
         $this->get(route('home'))->assertSee('Still live post')->assertDontSee('Expired old post');
     }

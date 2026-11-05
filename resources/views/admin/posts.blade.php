@@ -8,7 +8,7 @@
     @php
         $pendingCount = $posts->filter->isPending()->count();
         $initialTab = $pendingCount > 0 && $search === '' ? 'pending' : 'all';
-        $tabs = ['pending' => 'Pending', 'approved' => 'Approved', 'featured' => 'Featured', 'rejected' => 'Rejected', 'all' => 'All'];
+        $tabs = ['pending' => 'Pending', 'approved' => 'Approved', 'featured' => 'Featured', 'expired' => 'Expired', 'rejected' => 'Rejected', 'all' => 'All'];
     @endphp
 
                 <div class="setting-card">
@@ -79,19 +79,32 @@
                                         $images = $post->media->filter->isImage();
                                         $videos = $post->media->filter->isVideo();
                                         $cover = $images->first();
-                                        $daysLeft = (int) ceil(now()->diffInDays($post->expiresAt(), false));
+                                        $expiresAt = $post->expiresAt();
+                                        $daysLeft = $expiresAt ? (int) ceil(now()->diffInDays($expiresAt, false)) : null;
+                                        $isExpired = $post->isExpired();
                                     @endphp
-                                    <tr data-id="{{ $post->id }}" data-status="{{ $post->status->value }}" data-featured="{{ $post->is_featured ? '1' : '0' }}">
+                                    <tr data-id="{{ $post->id }}" data-status="{{ $isExpired ? 'expired' : $post->status->value }}" data-featured="{{ ($post->is_featured && ! $isExpired) ? '1' : '0' }}">
                                         <td class="check-col"><input class="form-check-input row-check" type="checkbox" aria-label="Select post: {{ $post->title }}"></td>
                                         <td>
-                                            <a href="{{ route('posts.show', $post) }}" class="cell-post" target="_blank" rel="noopener">
-                                                @if ($cover)
-                                                    <img src="{{ $cover->url() }}" width="54" height="54" alt="" loading="lazy">
-                                                @else
-                                                    <span class="no-media"><i class="bi {{ $videos->isNotEmpty() ? 'bi-camera-video' : 'bi-text-paragraph' }}"></i></span>
-                                                @endif
-                                                <div><strong>{{ $post->title }}</strong><small>{{ $post->topic }} &middot; #{{ $post->public_id }}</small></div>
-                                            </a>
+                                            @if ($isExpired)
+                                                <span class="cell-post">
+                                                    @if ($cover)
+                                                        <img src="{{ $cover->url() }}" width="54" height="54" alt="" loading="lazy">
+                                                    @else
+                                                        <span class="no-media"><i class="bi {{ $videos->isNotEmpty() ? 'bi-camera-video' : 'bi-text-paragraph' }}"></i></span>
+                                                    @endif
+                                                    <div><strong>{{ $post->title }}</strong><small>{{ $post->topic }} &middot; #{{ $post->public_id }}</small></div>
+                                                </span>
+                                            @else
+                                                <a href="{{ route('posts.show', $post) }}" class="cell-post" target="_blank" rel="noopener">
+                                                    @if ($cover)
+                                                        <img src="{{ $cover->url() }}" width="54" height="54" alt="" loading="lazy">
+                                                    @else
+                                                        <span class="no-media"><i class="bi {{ $videos->isNotEmpty() ? 'bi-camera-video' : 'bi-text-paragraph' }}"></i></span>
+                                                    @endif
+                                                    <div><strong>{{ $post->title }}</strong><small>{{ $post->topic }} &middot; #{{ $post->public_id }}</small></div>
+                                                </a>
+                                            @endif
                                         </td>
                                         <td><span class="cell-user"><span class="avatar avatar-icon" aria-hidden="true"><i class="bi bi-person-fill"></i></span>{{ $post->user->name }}</span></td>
                                         <td class="hide-xl">
@@ -108,10 +121,10 @@
                                             </span>
                                         </td>
                                         <td class="nowrap muted" data-order="{{ $post->created_at->timestamp }}" title="{{ $post->created_at->format('M j, Y g:i A') }}">{{ $post->created_at->diffForHumans() }}</td>
-                                        @if ($post->isRejected())
-                                            <td class="nowrap muted hide-xl" data-order="9999">&mdash;</td>
-                                        @elseif ($daysLeft <= 0)
-                                            <td class="nowrap hide-xl" data-order="0"><span class="text-danger fw-semibold">Expired</span></td>
+                                        @if ($post->isRejected() || $post->isPending())
+                                            <td class="nowrap muted hide-xl" data-order="9999" title="{{ $post->isPending() ? 'Countdown starts when approved' : '' }}">{{ $post->isPending() ? 'On approval' : '—' }}</td>
+                                        @elseif ($isExpired)
+                                            <td class="nowrap hide-xl" data-order="0"><span class="text-danger fw-semibold" title="Lifetime ended {{ $expiresAt?->format('M j, Y g:i A') }}. Removed by the daily purge.">Expired — awaiting cleanup</span></td>
                                         @else
                                             <td @class(['nowrap', 'hide-xl', 'muted' => $daysLeft > 3]) data-order="{{ $daysLeft }}">
                                                 @if ($daysLeft <= 3)
@@ -122,8 +135,12 @@
                                             </td>
                                         @endif
                                         <td class="nowrap">
-                                            <span class="status st-{{ $post->status->value }}" @if ($post->isRejected()) title="{{ $post->rejection_reason }}{{ $post->rejection_note ? ': '.$post->rejection_note : '' }}" @endif>{{ $post->status->label() }}</span>
-                                            @if ($post->is_featured)
+                                            @if ($isExpired)
+                                                <span class="status st-rejected" title="Approved lifetime ended. Permanent deletion runs daily at 03:00.">Expired</span>
+                                            @else
+                                                <span class="status st-{{ $post->status->value }}" @if ($post->isRejected()) title="{{ $post->rejection_reason }}{{ $post->rejection_note ? ': '.$post->rejection_note : '' }}" @endif>{{ $post->status->label() }}</span>
+                                            @endif
+                                            @if ($post->is_featured && ! $isExpired)
                                                 <i class="bi bi-star-fill feature-flag" title="Featured" aria-label="Featured"></i>
                                             @endif
                                         </td>

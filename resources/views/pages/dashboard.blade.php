@@ -33,7 +33,7 @@
 
                 <section class="panel-card">
                     <h2 class="form-section-title">Your recent posts</h2>
-                    <p class="form-section-sub">Posts are permanently deleted {{ \App\Models\Post::LIFETIME_DAYS }} days after publishing.</p>
+                    <p class="form-section-sub">Posts are permanently deleted {{ \App\Models\Post::LIFETIME_DAYS }} days after approval.</p>
 
                     @forelse ($recentPosts as $post)
                         @php
@@ -71,10 +71,12 @@
                                     @if ($postVideos->isNotEmpty())
                                         <span><i class="bi bi-camera-video"></i>{{ trans_choice('{1} :count video|[2,*] :count videos', $postVideos->count()) }}</span>
                                     @endif
-                                    @if ($post->expiresAt()->isFuture())
+                                    @if ($post->expiresAt()?->isFuture())
                                         <span><i class="bi bi-hourglass-split"></i>Deleted {{ $post->expiresAt()->diffForHumans() }}</span>
-                                    @else
-                                        <span><i class="bi bi-trash3"></i>Scheduled for deletion</span>
+                                    @elseif ($post->isExpired())
+                                        <span><i class="bi bi-trash3"></i>Expired — awaiting cleanup</span>
+                                    @elseif ($post->isPending())
+                                        <span><i class="bi bi-hourglass-split"></i>Lifetime starts on approval</span>
                                     @endif
                                 </p>
                             </div>

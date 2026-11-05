@@ -173,10 +173,12 @@
                             <i class="bi bi-hourglass-split"></i>
                             <div>
                                 <strong>Posts are temporary</strong>
-                                @if ($editing)
-                                    <p>Editing doesn't extend your post's life. It will still be permanently deleted on {{ $post->expiresAt()->format('F j, Y') }}, along with all of its photos and videos.</p>
+                                @if ($editing && $post->expiresAt())
+                                    <p>Editing doesn't extend your post's life. It will still be permanently deleted on {{ $post->expiresAt()->format('F j, Y') }} (30 days after approval), along with all of its photos and videos.</p>
+                                @elseif ($editing)
+                                    <p>Editing doesn't change moderation. Once approved, the post and all of its photos and videos are permanently deleted 30 days after approval.</p>
                                 @else
-                                    <p>Your post and all of its photos and videos will be permanently deleted 30 days after publishing. This can't be undone.</p>
+                                    <p>Your post and all of its photos and videos will be permanently deleted 30 days after approval. This can't be undone.</p>
                                 @endif
                             </div>
                         </div>
@@ -210,7 +212,7 @@
                             <ol class="lifecycle">
                                 <li><span class="step-icon"><i class="bi bi-link-45deg"></i></span><div><strong>Same link</strong><span>Your post keeps its ID #{{ $post->public_id }}</span></div></li>
                                 <li><span class="step-icon"><i class="bi bi-images"></i></span><div><strong>Media you keep stays</strong><span>Only photos and videos you remove are deleted</span></div></li>
-                                <li><span class="step-icon"><i class="bi bi-calendar2-x"></i></span><div><strong>Same deletion date</strong><span>{{ $post->expiresAt()->format('M j, Y') }}</span></div></li>
+                                <li><span class="step-icon"><i class="bi bi-calendar2-x"></i></span><div><strong>Same deletion date</strong><span>{{ $post->expiresAt() ? $post->expiresAt()->format('M j, Y') : 'Starts when approved' }}</span></div></li>
                             </ol>
                         </div>
                     @else
@@ -224,7 +226,7 @@
                                     <li><span class="step-icon"><i class="bi bi-broadcast"></i></span><div><strong>Live in the feed</strong><span>Appears at the top of the latest posts</span></div></li>
                                     <li><span class="step-icon"><i class="bi bi-shield-check"></i></span><div><strong>Moderators keep watch</strong><span>Posts that break the rules are removed</span></div></li>
                                 @endif
-                                <li><span class="step-icon"><i class="bi bi-calendar2-x"></i></span><div><strong>Deleted after 30 days</strong><span>Post and media removed permanently</span></div></li>
+                                <li><span class="step-icon"><i class="bi bi-calendar2-x"></i></span><div><strong>Deleted 30 days after approval</strong><span>Post and media removed permanently</span></div></li>
                             </ol>
                         </div>
                     @endif
