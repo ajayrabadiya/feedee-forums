@@ -23,28 +23,29 @@ class SitemapTest extends TestCase
     }
 
     /**
-     * @return array<string, SimpleXMLElement>
+     * @return array{0: string, 1: array<string, SimpleXMLElement>}
      */
-    private function sitemapUrls(): array
+    private function sitemap(): array
     {
         $response = $this->get('/sitemap.xml');
 
         $response->assertOk();
         $response->assertHeader('Content-Type', 'application/xml; charset=UTF-8');
 
-        $xml = new SimpleXMLElement($response->getContent());
+        $content = $response->getContent();
+        $xml = new SimpleXMLElement($content);
         $urls = [];
 
         foreach ($xml->url as $url) {
             $urls[(string) $url->loc] = $url;
         }
 
-        return $urls;
+        return [$content, $urls];
     }
 
     public function test_sitemap_lists_the_public_pages_on_the_live_domain(): void
     {
-        $urls = $this->sitemapUrls();
+        [, $urls] = $this->sitemap();
 
         $this->assertSame([
             'https://feedeeforums.com/',
@@ -56,23 +57,26 @@ class SitemapTest extends TestCase
         $this->assertSame('hourly', (string) $urls['https://feedeeforums.com/']->changefreq);
     }
 
-    public function test_sitemap_lists_published_posts_with_their_images(): void
+    public function test_sitemap_lists_published_post_pages_without_direct_image_urls(): void
     {
         $this->travelTo(Carbon::parse('2026-11-04 10:00:00'));
 
         $post = Post::factory()->create(['title' => 'Sunday feast & more', 'created_at' => now()->subDays(2), 'updated_at' => now()->subDay()]);
         $image = PostMedia::factory()->for($post)->create();
 
-        $urls = $this->sitemapUrls();
+        [$content, $urls] = $this->sitemap();
         $entry = $urls['https://feedeeforums.com/p/'.$post->public_id] ?? null;
 
         $this->assertNotNull($entry);
         $this->assertSame('2026-11-03T10:00:00+00:00', (string) $entry->lastmod);
-        $this->assertSame(
-            Storage::disk(config('media.disk'))->url($image->file_path),
-            (string) $entry->children('http://www.google.com/schemas/sitemap-image/1.1')->image->loc,
-        );
+        $this->assertSame('weekly', (string) $entry->changefreq);
+        $this->assertSame('0.7', (string) $entry->priority);
         $this->assertSame('2026-11-03T10:00:00+00:00', (string) $urls['https://feedeeforums.com/']->lastmod);
+        $this->assertStringNotContainsString('/storage/', $content);
+        $this->assertStringNotContainsString($image->file_path, $content);
+        $this->assertStringNotContainsString('xmlns:image', $content);
+        $this->assertStringNotContainsString('<image:', $content);
+        $this->assertCount(count($urls), array_unique(array_keys($urls)));
     }
 
     public function test_hidden_and_expired_posts_and_private_pages_are_left_out(): void
