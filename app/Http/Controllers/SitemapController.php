@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\MediaType;
 use App\Models\Post;
 use Illuminate\Http\Response;
 
@@ -15,13 +14,13 @@ class SitemapController extends Controller
 
     /**
      * XML sitemap of the public pages and every post currently visible to the public.
+     * Lists post page URLs (not direct media URLs) so Google discovers /p/{public_id}.
      * URLs use APP_URL, so the live sitemap always points at the canonical domain.
      */
     public function __invoke(): Response
     {
         $posts = Post::query()
             ->published()
-            ->with(['media' => fn ($query) => $query->where('media_type', MediaType::Image)])
             ->latest()
             ->latest('id')
             ->take(self::MAX_POSTS)
